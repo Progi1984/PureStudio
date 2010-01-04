@@ -1,0 +1,23 @@
+Procedure.i Main_DocGen(*Param)
+  ; Parsing files
+  Debug "==Parsing Files"
+  DocGen_Parser(gsMainFile)
+  If ListSize(LL_IncludeFiles()) > 0
+    ForEach LL_IncludeFiles()
+      With LL_IncludeFiles()
+        DocGen_Parser(\sPath + \sFilename)
+      EndWith
+    Next
+  EndIf
+    
+  ; Export docs
+  Debug "==Export docs"
+  If ListSize(LL_Exports()) > 0
+    ForEach LL_Exports()
+      With LL_Exports()
+        DocGen_Export(\lType, \sPathExport)
+      EndWith
+    Next
+   EndIf
+EndProcedure
+
