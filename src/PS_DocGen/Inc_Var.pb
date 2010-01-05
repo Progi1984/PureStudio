@@ -7,6 +7,13 @@ Structure S_FileInclude
   sPath.s
   sFilename.s
 EndStructure
+Structure S_TypeStructure
+  sName.s
+  sDescription.s
+  sField.s
+  sFieldDescription.s
+  ptrInclude.l
+EndStructure
 
 ;-Constantes
 Enumeration ; ExportType
@@ -36,7 +43,9 @@ Enumeration ; ExportType
 EndEnumeration
 Enumeration ; Regex
   #Regex_Array
+  #Regex_CommentBefore
   #Regex_Doc
+  #Regex_EndGroup
   #Regex_Enumeration
   #Regex_IncFile
   #Regex_IncPath
@@ -49,12 +58,15 @@ Enumeration ; Regex
   #Regex_ProcedureDLL
   #Regex_Structure
 EndEnumeration
+
 #DQuote = Chr(34)
+
 #sApplication_Name = "DocGen"
 
 ;- Linked Lists
 Global NewList LL_IncludeFiles.S_FileInclude()
 Global NewList LL_Exports.S_TypeExport()
+Global NewList LL_ListStructures.S_TypeStructure()
 
 ;-Globals
 Global gsMainFile.s
@@ -125,5 +137,16 @@ EndIf
 ;@desc : Regex for detecting doc
 If CreateRegularExpression(#Regex_Doc, "(?<=(;@\s)).+")
   MR_Error("REGEX : Doc > " + RegularExpressionError())
+  End
+EndIf
+;@desc : Regex for detecting whatever before comment
+If CreateRegularExpression(#Regex_CommentBefore, "^[^;]+(?=(;))")
+  MR_Error("REGEX : CommentBefore > " + RegularExpressionError())
+  End
+EndIf
+
+;@desc : Regex for detecting EndGroup (EndStructure, EndEnumeration)
+If CreateRegularExpression(#Regex_EndGroup, "(?i)end[A-Za-z]+")
+  MR_Error("REGEX : EndGroup > " + RegularExpressionError())
   End
 EndIf
