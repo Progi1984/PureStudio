@@ -20,6 +20,12 @@ Structure S_TypeEnum
   sFieldDescription.s
   ptrInclude.l
 EndStructure
+Structure S_TypeMacro
+  sName.s
+  sDescription.s
+  sContent.s
+  ptrInclude.l
+EndStructure
 
 ;-Constantes
 Enumeration ; ExportType
@@ -74,6 +80,7 @@ Global NewList LL_IncludeFiles.S_FileInclude()
 Global NewList LL_Exports.S_TypeExport()
 Global NewList LL_ListStructures.S_TypeStructure()
 Global NewList LL_ListEnumerations.S_TypeEnum()
+Global NewList LL_ListMacros.S_TypeMacro()
 
 ;-Globals
 Global gsMainFile.s

@@ -2,7 +2,7 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
   Protected plFile.l, plNbResults.l, plInc.l
   Protected psPathCur.s
   Protected psLine.s, psContent.s
-  Protected pbInMultiline.b, pbInStructure.b, pbInEnumeration.b
+  Protected pbInMultiline.b, pbInStructure.b, pbInEnumeration.b, pbInMacro.b
   Protected Dim ResRegex.s(0)
   
   ; Initialization of protected variables
@@ -72,6 +72,19 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
             EndIf
           ;}
           ;{ Macros }
+            plNbResults = ExtractRegularExpression(#Regex_Macro, psContent, ResRegex())
+            If plNbResults = 1
+              LastElement(LL_ListMacros())
+              AddElement(LL_ListMacros())
+              With LL_ListMacros()
+                \ptrInclude = ptrInclude
+                \sName = ResRegex(0)
+                \sContent = psContent
+                Debug "Macro > " + ResRegex(0)
+              EndWith
+              pbInMultiline = #True
+              pbInMacro = #True
+            EndIf
           ;}
           ;{ Tableaux }
           ;}
@@ -149,6 +162,32 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
             Else
               pbInMultiline = #False
               pbInEnumeration = #False
+            EndIf
+          EndIf
+          If pbInMacro = #True
+            ; Macro's Content
+            plNbResults = ExtractRegularExpression(#Regex_CommentBefore, psLine, ResRegex())
+            If plNbResults = 1
+              With LL_ListMacros()
+                \sContent + Chr(13) + Chr(10)+ ResRegex(0)
+                Debug "Content > "+ ResRegex(0)
+              EndWith
+            EndIf
+            ; Documentation
+            plNbResults = ExtractRegularExpression(#Regex_Doc, psLine, ResRegex())
+            If plNbResults = 1
+              If ResRegex(0) = "" 
+                ResRegex(0) = " "
+              EndIf
+              With LL_ListMacros()
+                \sDescription + ResRegex(0)
+              EndWith
+            EndIf
+            If MatchRegularExpression(#Regex_EndGroup, psLine) = #True
+              If FindString(LCase(psLine), "endmacro", 0) > 0
+                pbInMultiline = #False
+                pbInMacro = #False
+              EndIf
             EndIf
           EndIf
         EndIf
