@@ -8,7 +8,7 @@ IncludePath "PS_DocGen"
 
 gsMainFile = "/home/franklin/Documents/Projets/Moebius/Moebius_Main.pb"
 If FileSize(gsMainFile) > 0
-  Debug CreateThread(@Main_DocGen(), #True)
+  Main_DocGen()
 Else
   MR_Error("FileSize("+gsMainFile + ") >0")
 EndIf

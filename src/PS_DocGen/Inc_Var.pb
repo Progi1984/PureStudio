@@ -14,6 +14,12 @@ Structure S_TypeStructure
   sFieldDescription.s
   ptrInclude.l
 EndStructure
+Structure S_TypeEnum
+  sDescription.s
+  sField.s
+  sFieldDescription.s
+  ptrInclude.l
+EndStructure
 
 ;-Constantes
 Enumeration ; ExportType
@@ -67,6 +73,7 @@ EndEnumeration
 Global NewList LL_IncludeFiles.S_FileInclude()
 Global NewList LL_Exports.S_TypeExport()
 Global NewList LL_ListStructures.S_TypeStructure()
+Global NewList LL_ListEnumerations.S_TypeEnum()
 
 ;-Globals
 Global gsMainFile.s
@@ -78,75 +85,74 @@ EndMacro
 
 ;-Regex
 ;@desc : Regex for detecting include files
-If CreateRegularExpression(#Regex_IncFile, "(?<=((?i)includefile)\s"+#DQuote+")[^\"+#DQuote+"]+(?="+#DQuote+")")
+If CreateRegularExpression(#Regex_IncFile, "(?<=((?i)includefile)\s"+#DQuote+")[^\"+#DQuote+"]+(?="+#DQuote+")") = #False
   MR_Error("REGEX : IncFile > " + RegularExpressionError())
   End
 EndIf
 ;@desc : Regex for defining include path
-If CreateRegularExpression(#Regex_IncPath, "(?<=((?i)includepath)\s"+#DQuote+")[^\"+#DQuote+"]+(?="+#DQuote+")")
+If CreateRegularExpression(#Regex_IncPath, "(?<=((?i)includepath)\s"+#DQuote+")[^\"+#DQuote+"]+(?="+#DQuote+")") = #False
   MR_Error("REGEX : IncPath > " + RegularExpressionError())
   End
 EndIf
 ;@desc : Regex for detecting structures
-If CreateRegularExpression(#Regex_Structure, "(?<=((?i)structure))\s+[A-Za-z\_]+")
+If CreateRegularExpression(#Regex_Structure, "(?<=((?i)structure))\s+[A-Za-z\_]+") = #False
   MR_Error("REGEX : Structure > " + RegularExpressionError())
   End
 EndIf
 ;@desc : Regex for detecting enumerations
-If CreateRegularExpression(#Regex_Enumeration, "(?<=((?i)enumeration))")
+If CreateRegularExpression(#Regex_Enumeration, "(?<=((?i)enumeration))") = #False
   MR_Error("REGEX : Enumeration > " + RegularExpressionError())
   End
 EndIf
 ;@desc : Regex for detecting macros
-If CreateRegularExpression(#Regex_Macro, "(?<=((?i)macro))\s+[A-Za-z\_]+")
+If CreateRegularExpression(#Regex_Macro, "(?<=((?i)macro))\s+[A-Za-z\_]+") = #False
   MR_Error("REGEX : Macro > " + RegularExpressionError())
   End
 EndIf
 ;@desc : Regex for detecting arrays
-If CreateRegularExpression(#Regex_Array, "(?<=((?i)dim))\s+[A-Za-z\_]+")
+If CreateRegularExpression(#Regex_Array, "(?<=((?i)dim))\s+[A-Za-z\_]+") = #False
   MR_Error("REGEX : Array > " + RegularExpressionError())
   End
 EndIf
 ;@desc : Regex for detecting linked lists
-If CreateRegularExpression(#Regex_LinkedList, "(?<=((?i)array))\s+[A-Za-z\_]+")
+If CreateRegularExpression(#Regex_LinkedList, "(?<=((?i)array))\s+[A-Za-z\_]+") = #False
   MR_Error("REGEX : Linked List > " + RegularExpressionError())
   End
 EndIf
 ;@desc : Regex for detecting structures
-If CreateRegularExpression(#Regex_Procedure, "(?<=((?i)procedure\s))[A-Za-z\_]+")
+If CreateRegularExpression(#Regex_Procedure, "(?<=((?i)procedure\s))[A-Za-z\_]+") = #False
   MR_Error("REGEX : Procedure > " + RegularExpressionError())
   End
 EndIf
-If CreateRegularExpression(#Regex_ProcedureC, "(?<=((?i)procedurec\s))[A-Za-z\_]+")
+If CreateRegularExpression(#Regex_ProcedureC, "(?<=((?i)procedurec\s))[A-Za-z\_]+") = #False
   MR_Error("REGEX : ProcedureC > " + RegularExpressionError())
   End
 EndIf
-If CreateRegularExpression(#Regex_ProcedureCDLL, "(?<=((?i)procedurecdll\s))[A-Za-z\_]+")
+If CreateRegularExpression(#Regex_ProcedureCDLL, "(?<=((?i)procedurecdll\s))[A-Za-z\_]+") = #False
   MR_Error("REGEX : ProcedureCDLL > " + RegularExpressionError())
   End
 EndIf
-If CreateRegularExpression(#Regex_ProcedureDLL, "(?<=((?i)proceduredll\s))[A-Za-z\_]+")
+If CreateRegularExpression(#Regex_ProcedureDLL, "(?<=((?i)proceduredll\s))[A-Za-z\_]+") = #False
   MR_Error("REGEX : ProcedureDLL > " + RegularExpressionError())
   End
 EndIf
 ;@desc : Regex for detecting params
-If CreateRegularExpression(#Regex_Parameter, "(?<=(\(|\,|\s))[A-Za-z\_\.]+(?=(\)|\,|\s))")
+If CreateRegularExpression(#Regex_Parameter, "(?<=(\(|\,|\s))[A-Za-z\_\.]+(?=(\)|\,|\s))") = #False
   MR_Error("REGEX : Parameter > " + RegularExpressionError())
   End
 EndIf
 ;@desc : Regex for detecting doc
-If CreateRegularExpression(#Regex_Doc, "(?<=(;@\s)).+")
+If CreateRegularExpression(#Regex_Doc, "(?<=(;@\s)).+") = #False
   MR_Error("REGEX : Doc > " + RegularExpressionError())
   End
 EndIf
 ;@desc : Regex for detecting whatever before comment
-If CreateRegularExpression(#Regex_CommentBefore, "^[^;]+(?=(;))")
+If CreateRegularExpression(#Regex_CommentBefore, "^[^;]+(?=(;{0,}))") = #False
   MR_Error("REGEX : CommentBefore > " + RegularExpressionError())
   End
 EndIf
-
 ;@desc : Regex for detecting EndGroup (EndStructure, EndEnumeration)
-If CreateRegularExpression(#Regex_EndGroup, "(?i)end[A-Za-z]+")
+If CreateRegularExpression(#Regex_EndGroup, "(?i)end[A-Za-z]+") = #False
   MR_Error("REGEX : EndGroup > " + RegularExpressionError())
   End
 EndIf
