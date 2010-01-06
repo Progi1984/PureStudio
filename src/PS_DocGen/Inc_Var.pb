@@ -38,6 +38,12 @@ Structure S_TypeLinkedList
   bIsGlobal.b
   ptrInclude.l
 EndStructure
+Structure S_TypeConstant
+  sName.s
+  sValue.s
+  sDescription.s
+  ptrInclude.l
+EndStructure
 
 ;-Constantes
 Enumeration ; ExportType
@@ -68,6 +74,8 @@ EndEnumeration
 Enumeration ; Regex
   #Regex_Array
   #Regex_CommentBefore
+  #Regex_Constant
+  #Regex_ConstantValue
   #Regex_Doc
   #Regex_EndGroup
   #Regex_Enumeration
@@ -96,6 +104,7 @@ Global NewList LL_ListEnumerations.S_TypeEnum()
 Global NewList LL_ListMacros.S_TypeMacro()
 Global NewList LL_ListArrays.S_TypeArray()
 Global NewList LL_ListLinkedLists.S_TypeLinkedList()
+Global NewList LL_ListConstants.S_TypeConstant()
 
 ;-Globals
 Global gsMainFile.s
@@ -181,5 +190,15 @@ EndIf
 ;@desc : Regex for detecting if it is a global
 If CreateRegularExpression(#Regex_IsGlobal, "(?i)Global") = #False
   MR_Error("REGEX : IsGlobal > " + RegularExpressionError())
+  End
+EndIf
+;@desc : Regex for detecting comment
+If CreateRegularExpression(#Regex_Constant, "#[A-Za-z\_]{1,}(?=\s{0,}=)") = #False
+  MR_Error("REGEX : Comment > " + RegularExpressionError())
+  End
+EndIf
+;@desc : Regex for detecting if it is a global
+If CreateRegularExpression(#Regex_ConstantValue, "(?<==\s).+") = #False
+  MR_Error("REGEX : CommentValue > " + RegularExpressionError())
   End
 EndIf

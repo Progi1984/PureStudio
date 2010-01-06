@@ -125,6 +125,25 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
             EndIf
           ;}
           ;{ Constantes }
+            plNbResults = ExtractRegularExpression(#Regex_Constant, psContent, ResRegex())
+            If plNbResults = 1
+              LastElement(LL_ListConstants())
+              AddElement(LL_ListConstants())
+              With LL_ListConstants()
+                \ptrInclude = ptrInclude
+                \sName = ResRegex(0)
+                plNbResults = ExtractRegularExpression(#Regex_ConstantValue, psContent, ResRegex())
+                If plNbResults = 1
+                  \sValue = ResRegex(0)
+                EndIf
+                plNbResults = ExtractRegularExpression(#Regex_Doc, psContent, ResRegex())
+                If plNbResults = 1
+                  \sDescription = ResRegex(0)
+                EndIf
+                Debug "Constant > " + \sName
+                Debug "Constant > Value > " + \sValue
+              EndWith
+            EndIf
           ;}
           ;{ Procedure(C)(DLL) }
           ;}
