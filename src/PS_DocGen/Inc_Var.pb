@@ -26,6 +26,18 @@ Structure S_TypeMacro
   sContent.s
   ptrInclude.l
 EndStructure
+Structure S_TypeArray
+  sName.s
+  sDescription.s
+  bIsGlobal.b
+  ptrInclude.l
+EndStructure
+Structure S_TypeLinkedList
+  sName.s
+  sDescription.s
+  bIsGlobal.b
+  ptrInclude.l
+EndStructure
 
 ;-Constantes
 Enumeration ; ExportType
@@ -61,6 +73,7 @@ Enumeration ; Regex
   #Regex_Enumeration
   #Regex_IncFile
   #Regex_IncPath
+  #Regex_IsGlobal
   #Regex_LinkedList
   #Regex_Macro
   #Regex_Parameter
@@ -81,6 +94,8 @@ Global NewList LL_Exports.S_TypeExport()
 Global NewList LL_ListStructures.S_TypeStructure()
 Global NewList LL_ListEnumerations.S_TypeEnum()
 Global NewList LL_ListMacros.S_TypeMacro()
+Global NewList LL_ListArrays.S_TypeArray()
+Global NewList LL_ListLinkedLists.S_TypeLinkedList()
 
 ;-Globals
 Global gsMainFile.s
@@ -117,12 +132,12 @@ If CreateRegularExpression(#Regex_Macro, "(?<=((?i)macro))\s+[A-Za-z\_]+") = #Fa
   End
 EndIf
 ;@desc : Regex for detecting arrays
-If CreateRegularExpression(#Regex_Array, "(?<=((?i)dim))\s+[A-Za-z\_]+") = #False
+If CreateRegularExpression(#Regex_Array, "(?<=((?i)dim))\s+[A-Za-z0-9\_\(\)\.]+") = #False
   MR_Error("REGEX : Array > " + RegularExpressionError())
   End
 EndIf
 ;@desc : Regex for detecting linked lists
-If CreateRegularExpression(#Regex_LinkedList, "(?<=((?i)array))\s+[A-Za-z\_]+") = #False
+If CreateRegularExpression(#Regex_LinkedList, "(?<=((?i)newlist))\s+[A-Za-z\_\(\)\.]+") = #False
   MR_Error("REGEX : Linked List > " + RegularExpressionError())
   End
 EndIf
@@ -161,5 +176,10 @@ EndIf
 ;@desc : Regex for detecting EndGroup (EndStructure, EndEnumeration)
 If CreateRegularExpression(#Regex_EndGroup, "(?i)end[A-Za-z]+") = #False
   MR_Error("REGEX : EndGroup > " + RegularExpressionError())
+  End
+EndIf
+;@desc : Regex for detecting if it is a global
+If CreateRegularExpression(#Regex_IsGlobal, "(?i)Global") = #False
+  MR_Error("REGEX : IsGlobal > " + RegularExpressionError())
   End
 EndIf

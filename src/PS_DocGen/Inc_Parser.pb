@@ -87,8 +87,42 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
             EndIf
           ;}
           ;{ Tableaux }
+            plNbResults = ExtractRegularExpression(#Regex_Array, psContent, ResRegex())
+            If plNbResults = 1
+              LastElement(LL_ListArrays())
+              AddElement(LL_ListArrays())
+              With LL_ListArrays()
+                \ptrInclude = ptrInclude
+                \sName = ResRegex(0)
+                plNbResults = ExtractRegularExpression(#Regex_Doc, psContent, ResRegex())
+                If plNbResults = 1
+                  \sDescription = ResRegex(0)
+                EndIf
+                If MatchRegularExpression(#Regex_IsGlobal, psContent) = #True
+                  \bIsGlobal = #True
+                EndIf
+                Debug "Array > " + \sName
+              EndWith
+            EndIf
           ;}
           ;{ Listes Chainees }
+            plNbResults = ExtractRegularExpression(#Regex_LinkedList, psContent, ResRegex())
+            If plNbResults = 1
+              LastElement(LL_ListLinkedLists())
+              AddElement(LL_ListLinkedLists())
+              With LL_ListLinkedLists()
+                \ptrInclude = ptrInclude
+                \sName = ResRegex(0)
+                plNbResults = ExtractRegularExpression(#Regex_Doc, psContent, ResRegex())
+                If plNbResults = 1
+                  \sDescription = ResRegex(0)
+                EndIf
+                If MatchRegularExpression(#Regex_IsGlobal, psContent) = #True
+                  \bIsGlobal = #True
+                EndIf
+                Debug "LinkedList > " + \sName
+              EndWith
+            EndIf
           ;}
           ;{ Constantes }
           ;}
