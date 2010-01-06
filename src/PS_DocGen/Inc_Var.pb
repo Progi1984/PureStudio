@@ -44,6 +44,15 @@ Structure S_TypeConstant
   sDescription.s
   ptrInclude.l
 EndStructure
+Structure S_TypeProcedure
+  bIsC.b
+  bIsDLL.b
+  sName.s
+  sParameter.s
+  sDescription.s
+  sContent.s
+  ptrInclude.l
+EndStructure
 
 ;-Constantes
 Enumeration ; ExportType
@@ -105,6 +114,7 @@ Global NewList LL_ListMacros.S_TypeMacro()
 Global NewList LL_ListArrays.S_TypeArray()
 Global NewList LL_ListLinkedLists.S_TypeLinkedList()
 Global NewList LL_ListConstants.S_TypeConstant()
+Global NewList LL_ListProcedures.S_TypeProcedure()
 
 ;-Globals
 Global gsMainFile.s
