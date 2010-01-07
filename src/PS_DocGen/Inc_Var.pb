@@ -47,8 +47,11 @@ EndStructure
 Structure S_TypeProcedure
   bIsC.b
   bIsDLL.b
+  sProcedure.s
   sName.s
-  sParameter.s
+  sType.s
+  sParameterName.s
+  sParameterType.s
   sDescription.s
   sContent.s
   ptrInclude.l
@@ -93,11 +96,15 @@ Enumeration ; Regex
   #Regex_IsGlobal
   #Regex_LinkedList
   #Regex_Macro
-  #Regex_Parameter
   #Regex_Procedure
   #Regex_ProcedureC
   #Regex_ProcedureCDLL
   #Regex_ProcedureDLL
+  #Regex_ProcedureName
+  #Regex_ProcedureParameter
+  #Regex_ProcedureParameterName
+  #Regex_ProcedureParameterType
+  #Regex_ProcedureType
   #Regex_Structure
 EndEnumeration
 
@@ -160,26 +167,56 @@ If CreateRegularExpression(#Regex_LinkedList, "(?<=((?i)newlist))\s+[A-Za-z\_\(\
   MR_Error("REGEX : Linked List > " + RegularExpressionError())
   End
 EndIf
+;@desc : Regex for detecting constant
+If CreateRegularExpression(#Regex_Constant, "#[A-Za-z\_]{1,}(?=\s{0,}=)") = #False
+  MR_Error("REGEX : Constant > " + RegularExpressionError())
+  End
+EndIf
+;@desc : Regex for detecting constant's value
+If CreateRegularExpression(#Regex_ConstantValue, "(?<==\s).+") = #False
+  MR_Error("REGEX : ConstantValue > " + RegularExpressionError())
+  End
+EndIf
 ;@desc : Regex for detecting structures
-If CreateRegularExpression(#Regex_Procedure, "(?<=((?i)procedure\s))[A-Za-z\_]+") = #False
+If CreateRegularExpression(#Regex_Procedure, "(?<=((?i)procedure))[A-Za-z0-9\_\s\.\(\,\)=\*]+") = #False
   MR_Error("REGEX : Procedure > " + RegularExpressionError())
   End
 EndIf
-If CreateRegularExpression(#Regex_ProcedureC, "(?<=((?i)procedurec\s))[A-Za-z\_]+") = #False
+If CreateRegularExpression(#Regex_ProcedureC, "(?<=((?i)procedurec))[A-Za-z0-9\_\s\.\(\,\)=\*]+") = #False
   MR_Error("REGEX : ProcedureC > " + RegularExpressionError())
   End
 EndIf
-If CreateRegularExpression(#Regex_ProcedureCDLL, "(?<=((?i)procedurecdll\s))[A-Za-z\_]+") = #False
+If CreateRegularExpression(#Regex_ProcedureCDLL, "(?<=((?i)procedurecdll))[A-Za-z0-9\_\s\.\(\,\)=\*]+") = #False
   MR_Error("REGEX : ProcedureCDLL > " + RegularExpressionError())
   End
 EndIf
-If CreateRegularExpression(#Regex_ProcedureDLL, "(?<=((?i)proceduredll\s))[A-Za-z\_]+") = #False
+If CreateRegularExpression(#Regex_ProcedureDLL, "(?<=((?i)proceduredll))[A-Za-z0-9\_\s\.\(\,\)=\*]+") = #False
   MR_Error("REGEX : ProcedureDLL > " + RegularExpressionError())
   End
 EndIf
+;@desc : Regex for detecting the type of procedure
+If CreateRegularExpression(#Regex_ProcedureType, "(?<=^\.)[A-Za-z\_]{1,}") = #False
+  MR_Error("REGEX : ProcedureType > " + RegularExpressionError())
+  End
+EndIf
+;@desc : Regex for detecting the name of procedure
+If CreateRegularExpression(#Regex_ProcedureName, "(?<=\s)[A-Za-z0-9\_]{1,}(?=\()") = #False
+  MR_Error("REGEX : ProcedureName > " + RegularExpressionError())
+  End
+EndIf
 ;@desc : Regex for detecting params
-If CreateRegularExpression(#Regex_Parameter, "(?<=(\(|\,|\s))[A-Za-z\_\.]+(?=(\)|\,|\s))") = #False
+If CreateRegularExpression(#Regex_ProcedureParameter, "(?<=(\(|\,))[A-Za-z0-9\*\_\$\.]+(?=(\)|\,|\=))") = #False
   MR_Error("REGEX : Parameter > " + RegularExpressionError())
+  End
+EndIf
+;@desc : Regex for detecting params name
+If CreateRegularExpression(#Regex_ProcedureParameterName, "[A-Za-z0-9\*\_\$]+(?=(\.|\$|\s|$))") = #False
+  MR_Error("REGEX : ParameterName > " + RegularExpressionError())
+  End
+EndIf
+;@desc : Regex for detecting params type
+If CreateRegularExpression(#Regex_ProcedureParameterType, "(?<=(\.))[A-Za-z0-9\_]{0,}") = #False
+  MR_Error("REGEX : ParameterType > " + RegularExpressionError())
   End
 EndIf
 ;@desc : Regex for detecting doc
@@ -200,15 +237,5 @@ EndIf
 ;@desc : Regex for detecting if it is a global
 If CreateRegularExpression(#Regex_IsGlobal, "(?i)Global") = #False
   MR_Error("REGEX : IsGlobal > " + RegularExpressionError())
-  End
-EndIf
-;@desc : Regex for detecting comment
-If CreateRegularExpression(#Regex_Constant, "#[A-Za-z\_]{1,}(?=\s{0,}=)") = #False
-  MR_Error("REGEX : Comment > " + RegularExpressionError())
-  End
-EndIf
-;@desc : Regex for detecting if it is a global
-If CreateRegularExpression(#Regex_ConstantValue, "(?<==\s).+") = #False
-  MR_Error("REGEX : CommentValue > " + RegularExpressionError())
   End
 EndIf

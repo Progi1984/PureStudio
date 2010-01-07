@@ -1,9 +1,11 @@
 ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
-  Protected plFile.l, plNbResults.l, plInc.l
+  Protected plFile.l, plNbResults.l, plNbResultsBis.l, plInc.l, plIncBis.l
   Protected psPathCur.s
-  Protected psLine.s, psContent.s
-  Protected pbInMultiline.b, pbInStructure.b, pbInEnumeration.b, pbInMacro.b
+  Protected psLine.s, psContent.s, psVar.s
+  Protected pbInMultiline.b, pbInStructure.b, pbInEnumeration.b, pbInMacro.b, pbInProcedure.b
+  Protected pbProcedureC.b, pbProcedureDLL.b
   Protected Dim ResRegex.s(0)
+  Protected Dim ResRegexBis.s(0)
   
   ; Initialization of protected variables
   psPathCur = ""
@@ -146,6 +148,87 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
             EndIf
           ;}
           ;{ Procedure(C)(DLL) }
+            plNbResults = ExtractRegularExpression(#Regex_ProcedureCDLL, psContent, ResRegex())
+            If plNbResults = 1
+              pbProcedureC = #True
+              pbProcedureDLL = #True
+              pbInProcedure = #True
+            Else
+              plNbResults = ExtractRegularExpression(#Regex_ProcedureDLL, psContent, ResRegex())
+              If plNbResults = 1
+                pbProcedureC = #False
+                pbProcedureDLL = #True
+                pbInProcedure = #True
+              Else
+                plNbResults = ExtractRegularExpression(#Regex_ProcedureC, psContent, ResRegex())
+                If plNbResults = 1
+                  pbProcedureC = #True
+                  pbProcedureDLL = #False
+                  pbInProcedure = #True
+                Else
+                  plNbResults = ExtractRegularExpression(#Regex_Procedure, psContent, ResRegex())
+                  If plNbResults = 1
+                    pbProcedureC = #False
+                    pbProcedureDLL = #False
+                    pbInProcedure = #True
+                  EndIf
+                EndIf
+              EndIf
+            EndIf
+            If pbInProcedure = #True
+              LastElement(LL_ListProcedures())
+              AddElement(LL_ListProcedures())
+              With LL_ListProcedures()
+                \bIsC = pbProcedureC
+                \bIsDLL = pbProcedureDLL
+                \ptrInclude = ptrInclude
+                \sProcedure = ResRegex(0)
+                Debug "Procedure > " + ResRegex(0)
+                plNbResults = ExtractRegularExpression(#Regex_ProcedureName, \sProcedure, ResRegex())
+                If plNbResults = 1
+                  \sName = ResRegex(0)
+                  Debug "Procedure > Name >"+ ResRegex(0)
+                EndIf
+                plNbResults = ExtractRegularExpression(#Regex_ProcedureType, \sProcedure, ResRegex())
+                If plNbResults = 1
+                  \sType = ResRegex(0)
+                  Debug "Procedure > Type >"+ ResRegex(0)
+                EndIf
+                plNbResults = ExtractRegularExpression(#Regex_ProcedureParameter, RemoveString(\sProcedure, " "), ResRegex())
+                If plNbResults >= 1
+                  ; Browse each parameter
+                  For plInc = 0 To plNbResults - 1
+                    psVar = ResRegex(plInc)
+                    Debug "Procedure > Parameter > "+ psVar
+                    plNbResultsBis = ExtractRegularExpression(#Regex_ProcedureParameterName, psVar, ResRegexBis())
+                    If plNbResultsBis >= 1
+                      If \sParameterName = ""
+                        \sParameterName = ResRegexBis(0)
+                      Else
+                        \sParameterName + "|" + ResRegexBis(0)
+                      EndIf
+                      Debug "Procedure > Parameter > Name >"+ ResRegexBis(0)
+                    EndIf
+                    plNbResultsBis = ExtractRegularExpression(#Regex_ProcedureParameterType, psVar, ResRegexBis())
+                    If plNbResultsBis >= 1
+                      If \sParameterType = ""
+                        \sParameterType = ResRegexBis(0)
+                      Else
+                        \sParameterType + "|" + ResRegexBis(0)
+                      EndIf
+                      Debug "Procedure > Parameter > Type >"+ ResRegexBis(0)
+                    Else
+                      If \sParameterType = ""
+                        \sParameterType = " "
+                      Else
+                        \sParameterType + "|" + " "
+                      EndIf
+                    EndIf
+                  Next
+                EndIf
+              EndWith
+              pbInMultiline = #True
+            EndIf
           ;}
         Else
           If pbInStructure = #True
@@ -223,7 +306,7 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
             If plNbResults = 1
               With LL_ListMacros()
                 \sContent + Chr(13) + Chr(10)+ ResRegex(0)
-                Debug "Content > "+ ResRegex(0)
+                ;Debug "Content > "+ ResRegex(0)
               EndWith
             EndIf
             ; Documentation
@@ -240,6 +323,22 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
               If FindString(LCase(psLine), "endmacro", 0) > 0
                 pbInMultiline = #False
                 pbInMacro = #False
+              EndIf
+            EndIf
+          EndIf
+          If pbInProcedure = #True
+            ; Procedure's Content
+            plNbResults = ExtractRegularExpression(#Regex_CommentBefore, psLine, ResRegex())
+            If plNbResults = 1
+              With LL_ListProcedures()
+                \sContent + Chr(13) + Chr(10)+ ResRegex(0)
+                ;Debug "Content > "+ ResRegex(0)
+              EndWith
+            EndIf
+            If MatchRegularExpression(#Regex_EndGroup, psLine) = #True
+              If FindString(LCase(psLine), "endprocedure", 0) > 0
+                pbInMultiline = #False
+                pbInProcedure = #False
               EndIf
             EndIf
           EndIf
