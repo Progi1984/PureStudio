@@ -1,9 +1,15 @@
 IncludePath "Inc"
   XIncludeFile "StringBuilder.pb"
+IncludePath "Inc_System"
+  CompilerSelect #PB_Compiler_OS
+    CompilerCase #PB_OS_Linux : XIncludeFile "Inc_Linux.pb"
+    CompilerCase #PB_OS_Windows : XIncludeFile "Inc_Windows.pb"
+  CompilerEndSelect
 IncludePath "PS_DocGen"
   XIncludeFile "Inc_Var.pb"
   XIncludeFile "Inc_Parser.pb"
   XIncludeFile "Inc_Export.pb"
+  XIncludeFile "Inc_Export_CHM.pb"
   XIncludeFile "Main.pb"
 
 gsMainFile = "/home/franklin/Documents/Projets/Moebius/Moebius_Main.pb"

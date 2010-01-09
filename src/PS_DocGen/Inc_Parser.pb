@@ -1,9 +1,9 @@
 ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
   Protected plFile.l, plNbResults.l, plNbResultsBis.l, plInc.l, plIncBis.l
   Protected psPathCur.s
-  Protected psLine.s, psContent.s, psVar.s
+  Protected psLine.s, psContent.s, psVar.s, psDoc.s
   Protected pbInMultiline.b, pbInStructure.b, pbInEnumeration.b, pbInMacro.b, pbInProcedure.b
-  Protected pbProcedureC.b, pbProcedureDLL.b
+  Protected pbProcedureC.b, pbProcedureDLL.b, pbFound.b
   Protected Dim ResRegex.s(0)
   Protected Dim ResRegexBis.s(0)
   
@@ -16,6 +16,7 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
     While Eof(plFile) = 0
       psLine = Trim(ReadString(plFile))
       If psLine > ""
+        pbFound = #False
         If pbInMultiline = #False
           plNbResults = ExtractRegularExpression(#Regex_CommentBefore, psLine, ResRegex())
           If plNbResults = 1
@@ -27,6 +28,7 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
             plNbResults = ExtractRegularExpression(#Regex_IncPath, psContent, ResRegex())
             If plNbResults = 1
               psPathCur = ResRegex(0)
+              pbFound = #True
               Debug "IncludePath > " + psPathCur
             EndIf
           ;}
@@ -40,6 +42,7 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
                 \sFilename = ResRegex(0)
                 Debug "IncludeFile > " + ResRegex(0)
               EndWith
+              pbFound = #True
             EndIf
           ;}
           ;{ Structures }
@@ -50,10 +53,13 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
               With LL_ListStructures()
                 \ptrInclude = ptrInclude
                 \sName = ResRegex(0)
+                \sDescription = psDoc
                 Debug "Structure > " + ResRegex(0)
               EndWith
+              psDoc = ""
               pbInMultiline = #True
               pbInStructure = #True
+              pbFound = #True
             EndIf
           ;}
           ;{ Enumerations }
@@ -63,14 +69,21 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
               AddElement(LL_ListEnumerations())
               With LL_ListEnumerations()
                 \ptrInclude = ptrInclude
+                \sDescription = psDoc
                 plNbResults = ExtractRegularExpression(#Regex_Doc, psContent, ResRegex())
                 If plNbResults = 1
-                  \sDescription = ResRegex(0)
+                  If \sDescription = ""
+                    \sDescription = ResRegex(0)
+                  Else
+                    \sDescription + #System_EOL + ResRegex(0)
+                  EndIf
                 EndIf
                 Debug "Enumeration > Found"
               EndWith
+              psDoc = ""
               pbInMultiline = #True
               pbInEnumeration = #True
+              pbFound = #True
             EndIf
           ;}
           ;{ Macros }
@@ -82,10 +95,13 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
                 \ptrInclude = ptrInclude
                 \sName = ResRegex(0)
                 \sContent = psContent
+                \sDescription = psDoc
                 Debug "Macro > " + ResRegex(0)
               EndWith
+              psDoc = ""
               pbInMultiline = #True
               pbInMacro = #True
+              pbFound = #True
             EndIf
           ;}
           ;{ Tableaux }
@@ -96,14 +112,21 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
               With LL_ListArrays()
                 \ptrInclude = ptrInclude
                 \sName = ResRegex(0)
+                \sDescription = psDoc
                 plNbResults = ExtractRegularExpression(#Regex_Doc, psContent, ResRegex())
                 If plNbResults = 1
-                  \sDescription = ResRegex(0)
+                  If \sDescription = ""
+                    \sDescription = ResRegex(0)
+                  Else
+                    \sDescription + #System_EOL + ResRegex(0)
+                  EndIf
                 EndIf
                 If MatchRegularExpression(#Regex_IsGlobal, psContent) = #True
                   \bIsGlobal = #True
                 EndIf
                 Debug "Array > " + \sName
+                psDoc = ""
+                pbFound = #True
               EndWith
             EndIf
           ;}
@@ -115,14 +138,21 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
               With LL_ListLinkedLists()
                 \ptrInclude = ptrInclude
                 \sName = ResRegex(0)
+                \sDescription = psDoc
                 plNbResults = ExtractRegularExpression(#Regex_Doc, psContent, ResRegex())
                 If plNbResults = 1
-                  \sDescription = ResRegex(0)
+                  If \sDescription = ""
+                    \sDescription = ResRegex(0)
+                  Else
+                    \sDescription + #System_EOL + ResRegex(0)
+                  EndIf
                 EndIf
                 If MatchRegularExpression(#Regex_IsGlobal, psContent) = #True
                   \bIsGlobal = #True
                 EndIf
                 Debug "LinkedList > " + \sName
+                psDoc = ""
+                pbFound = #True
               EndWith
             EndIf
           ;}
@@ -138,12 +168,19 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
                 If plNbResults = 1
                   \sValue = ResRegex(0)
                 EndIf
+                \sDescription = psDoc
                 plNbResults = ExtractRegularExpression(#Regex_Doc, psContent, ResRegex())
                 If plNbResults = 1
-                  \sDescription = ResRegex(0)
+                  If \sDescription = ""
+                    \sDescription = ResRegex(0)
+                  Else
+                    \sDescription + #System_EOL + ResRegex(0)
+                  EndIf
                 EndIf
                 Debug "Constant > " + \sName
                 Debug "Constant > Value > " + \sValue
+                psDoc = ""
+                pbFound = #True
               EndWith
             EndIf
           ;}
@@ -183,6 +220,7 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
                 \bIsDLL = pbProcedureDLL
                 \ptrInclude = ptrInclude
                 \sProcedure = ResRegex(0)
+                \sDescription = psDoc
                 Debug "Procedure > " + ResRegex(0)
                 plNbResults = ExtractRegularExpression(#Regex_ProcedureName, \sProcedure, ResRegex())
                 If plNbResults = 1
@@ -227,7 +265,21 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
                   Next
                 EndIf
               EndWith
+              psDoc = ""
               pbInMultiline = #True
+              pbFound = #True
+            EndIf
+          ;}
+          ;{ Documentation }
+            If pbFound = #False
+              plNbResults = ExtractRegularExpression(#Regex_Doc, psContent, ResRegex())
+              If plNbResults = 1
+                If psDoc = ""
+                  psDoc = ResRegex(0)
+                Else
+                  psDoc + #System_EOL + ResRegex(0)
+                EndIf
+              EndIf
             EndIf
           ;}
         Else
