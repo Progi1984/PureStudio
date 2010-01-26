@@ -1,5 +1,9 @@
 IncludePath "Inc"
   XIncludeFile "StringBuilder.pb"
+IncludePath "Inc_PoWeR"
+  XIncludeFile "Power.pb"
+  XIncludeFile "Text/Text.pb"
+  XIncludeFile "Text/Text_HTML.pb"
 IncludePath "Inc_System"
   CompilerSelect #PB_Compiler_OS
     CompilerCase #PB_OS_Linux : XIncludeFile "Inc_Linux.pb"
