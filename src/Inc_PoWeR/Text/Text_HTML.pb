@@ -6,6 +6,23 @@
   ; Structures
   Structure S_TextHtml
     sFilename.s
+    ; header
+    sAuthor.s
+    sTitle.s
+    sDescription.s
+    sGenerator.s
+    sKeyword.s
+    lEncoding.l
+    ; javascript
+    lJavascriptFileCount.l
+    dimJavascriptFile.s[50]
+    sJavascriptContent.s
+    ; css
+    lStylesheetFileCount.l
+    dimStylesheetFile.s[50]
+    sStylesheetContent.s
+    ; body
+    sHTMLBody.s
   EndStructure
   ; Macros
   Macro TextHtml_ID(object)
@@ -64,86 +81,286 @@ EndStructure
       Objects_TextHtml = TextHtml_INIT(@HTML_CloseFile())
     EndIf
     ; CreateFile
-    Protected *RObject.S_TextHtml = TextHtml_NEW(ID)
-     With *RObject
+    Protected *Object.S_TextHtml = TextHtml_NEW(ID)
+     With *Object
         \sFilename = Filename
      EndWith
-    ProcedureReturn *RObject
+    ProcedureReturn *Object
   EndProcedure
   ProcedureDLL.l HTML_CloseFile(ID.l)
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     ; CloseFile
-    If *RObject
+    If *Object
       
     EndIf
     ; Releasing object
-    If *RObject
+    If *Object
       TextHtml_FREEID(ID)
     EndIf
     ProcedureReturn #True
   EndProcedure
 
-ProcedureDLL HTML_SetAuthor(ID.l, Author.s)
-EndProcedure
-ProcedureDLL HTML_SetTitle(ID.l, Title.s)
-EndProcedure
-ProcedureDLL HTML_SetDescription(ID.l, Description.s)
-EndProcedure
-ProcedureDLL HTML_SetGenerator(ID.l, Generator.s)
-EndProcedure
-ProcedureDLL HTML_SetKeywords(ID.l, Keywords.s)
-EndProcedure
-ProcedureDLL HTML_SetEncoding(ID.l, Encoding.l)
-EndProcedure
-ProcedureDLL HTML_AddExternFile(ID.l, Type.l, Filename.s)
-  ; javascript
-  ; stylesheet
-EndProcedure
-ProcedureDLL HTML_AddInternFile(ID.l, Type.l, Content.s)
-  ; javascript
-  ; stylesheet
-EndProcedure
-
-ProcedureDLL HTML_OpenParagraph(ID.l, *Style.S_HTML_Style_Paragraph)
-EndProcedure
-ProcedureDLL HTML_CloseParagraph(ID.l)
-EndProcedure
-ProcedureDLL HTML_OpenSection(ID.l, *Style.S_HTML_Style_Paragraph)
-EndProcedure
-ProcedureDLL HTML_CloseSection(ID.l)
-EndProcedure
-;- Tables
-ProcedureDLL HTML_OpenTable(ID.l)
-EndProcedure
-ProcedureDLL HTML_CloseTable(ID.l)
-EndProcedure
-ProcedureDLL HTML_OpenTableHeader(ID.l)
-EndProcedure
-ProcedureDLL HTML_CloseTableHeader(ID.l)
-EndProcedure
-ProcedureDLL HTML_OpenTableRow(ID.l)
-EndProcedure
-ProcedureDLL HTML_CloseTableRow(ID.l)
-EndProcedure
-ProcedureDLL HTML_OpenTableCell(ID.l)
-EndProcedure
-ProcedureDLL HTML_CloseTableCell(ID.l)
-EndProcedure
-
-ProcedureDLL HTML_OpenList(ID.l)
-EndProcedure
-ProcedureDLL HTML_CloseList(ID.l)
-EndProcedure
-ProcedureDLL HTML_AddListElement(ID.l, Text.s)
-EndProcedure
-
-ProcedureDLL HTML_AddImage(ID.l, Filename.s)
-EndProcedure
-ProcedureDLL HTML_AddNewLine()
-EndProcedure
-ProcedureDLL HTML_AddText(ID.l, Text.s, *Style.S_HTML_Style_Format)
-EndProcedure
-ProcedureDLL HTML_AddTextWiki(ID.l, Text.s)
-EndProcedure
-ProcedureDLL HTML_AddHeader(ID.l, HeaderLevel.l, Text.s)
-EndProcedure
+  ProcedureDLL HTML_SetAuthor(ID.l, Author.s)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sAuthor = Author
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_SetTitle(ID.l, Title.s)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sTitle = Title
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_SetDescription(ID.l, Description.s)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+      If *Object
+        With *Object
+          \sDescription = Description
+        EndWith
+      EndIf
+  EndProcedure
+  ProcedureDLL HTML_SetGenerator(ID.l, Generator.s)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+      If *Object
+        With *Object
+          \sGenerator = Generator
+        EndWith
+      EndIf
+  EndProcedure
+  ProcedureDLL HTML_SetKeywords(ID.l, Keywords.s)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sKeyword = Keywords
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_SetEncoding(ID.l, Encoding.l)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \lEncoding = Encoding
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_AddExternFile(ID.l, Type.l, Filename.s)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        If Type = #HTML_Extern_Javascript
+          If Filename <> "" And \lJavascriptFileCount < 50
+            \dimJavascriptFile[\lJavascriptFileCount] = Filename
+            \lJavascriptFileCount + 1
+          EndIf
+        ElseIf Type = #HTML_Extern_CSS 
+          If Filename <> "" And \lStylesheetFileCount < 50
+            \dimStylesheetFile[\lStylesheetFileCount] = Filename
+            \lStylesheetFileCount + 1
+          EndIf
+        EndIf
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_AddInternFile(ID.l, Type.l, Content.s)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        If Type = #HTML_Extern_Javascript
+          If Content <> ""
+            \sJavascriptContent + Content
+          EndIf
+        ElseIf Type = #HTML_Extern_CSS
+          If Content <> ""
+            \sStylesheetContent + Content
+          EndIf
+        EndIf
+      EndWith
+    EndIf
+  EndProcedure
+  ;- Paragraphs
+  ProcedureDLL HTML_OpenParagraph(ID.l, *Style.S_HTML_Style_Paragraph)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + "<p>"
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_CloseParagraph(ID.l)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + "</p>"
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_OpenSection(ID.l, *Style.S_HTML_Style_Paragraph)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + "<div>"
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_CloseSection(ID.l)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + "</div>"
+      EndWith
+    EndIf
+  EndProcedure
+  ;- Tables
+  ProcedureDLL HTML_OpenTable(ID.l)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + "<table>"
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_CloseTable(ID.l)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + "</table>"
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_OpenTableHeader(ID.l)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + "<thead>"
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_CloseTableHeader(ID.l)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + "</thead>"
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_OpenTableBody(ID.l)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + "<tbody>"
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_CloseTableBody(ID.l)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + "</tbody>"
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_OpenTableRow(ID.l)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + "<tr>"
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_CloseTableRow(ID.l)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + "</tr>"
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_OpenTableCell(ID.l)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + "<td>"
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_CloseTableCell(ID.l)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + "</td>"
+      EndWith
+    EndIf
+  EndProcedure
+  ;- Lists
+  ProcedureDLL HTML_OpenList(ID.l)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + "<ul>"
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_CloseList(ID.l)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+       \sBody + "</ul>" 
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_AddListElement(ID.l, Text.s)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + "<li>" + Text + "</li>"
+      EndWith
+    EndIf
+  EndProcedure
+  ;- Content
+  ProcedureDLL HTML_AddImage(ID.l, Filename.s)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + "<img src="+Chr(34)+Filename+Chr(34)+" />"
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_AddNewLine()
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + "<br />"
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_AddText(ID.l, Text.s, *Style.S_HTML_Style_Format)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + Text
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_AddTextWiki(ID.l, Text.s)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + Text
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_AddHeader(ID.l, HeaderLevel.l, Text.s)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sBody + "<h"+Str(HeaderLevel)+">"
+        \sBody + Text
+        \sBody + "</h"+Str(HeaderLevel)+">"
+      EndWith
+    EndIf
+  EndProcedure
