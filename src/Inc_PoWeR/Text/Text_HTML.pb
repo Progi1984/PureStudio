@@ -68,11 +68,11 @@ Structure S_HTML_Style_Paragraph
   BorderStyle.S_HTML_Side
 EndStructure
 Structure S_HTML_Style_Format
-  FontColor.l
-  FontFamily.s
-  FontSize.l
-  FontStyle.l
-  BackgroundColor.l
+  sFontColor.s
+  sFontFamily.s
+  lFontSize.l
+  lFontStyle.l
+  sBackgroundColor.s
 EndStructure
 
   Declare HTML_CloseFile(ID.l)
@@ -245,11 +245,48 @@ EndStructure
     EndIf
   EndProcedure
   ;- Paragraphs
-  ProcedureDLL HTML_OpenParagraph(ID.l, *Style.S_HTML_Style_Paragraph)
+  ProcedureDLL HTML_OpenParagraph(ID.l, *Format.S_HTML_Style_Format = #Null, *Style.S_HTML_Style_Paragraph = #Null)
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    Protected sStyleFormat.s
     If *Object
       With *Object
-        \sHTMLBody + "<p>"
+        If *Format > #Null
+          If *Format\sFontColor > "" 
+            sStyleFormat + "font-color:" + *Format\sFontColor + ";"
+          EndIf
+          If *Format\sFontFamily > ""
+            sStyleFormat + "font-family:" + *Format\sFontFamily + ";"
+          EndIf
+          If *Format\lFontSize > #Null
+            sStyleFormat + "font-size:" + Str(*Format\lFontSize) + "px;"
+          EndIf
+          If *Format\lFontStyle > #Null
+            If *Format\lFontStyle & #PB_Font_Italic
+              *Format\lFontStyle - #PB_Font_Italic
+              sStyleFormat + "font-style:italic;"
+            EndIf
+            If *Format\lFontStyle & #PB_Font_Bold
+              *Format\lFontStyle - #PB_Font_Bold
+              sStyleFormat + "font-weight:bold;"
+            EndIf
+            If *Format\lFontStyle & #PB_Font_StrikeOut
+              *Format\lFontStyle - #PB_Font_StrikeOut
+              sStyleFormat + "font-style:strike-out;"
+            EndIf
+            If *Format\lFontStyle & #PB_Font_Underline
+              *Format\lFontStyle - #PB_Font_Underline
+              sStyleFormat + "text-decoration:underline;"
+            EndIf
+          EndIf
+          If *Format\sBackgroundColor > ""
+            sStyleFormat + " background-color:" + *Format\sBackgroundColor + ";"
+          EndIf
+        EndIf
+        If sStyleFormat > ""
+          \sHTMLBody + "<p style=" + #DQuote + sStyleFormat + #DQuote + ">"
+        Else
+          \sHTMLBody + "<p>"
+        EndIf
       EndWith
     EndIf
   EndProcedure
@@ -261,11 +298,48 @@ EndStructure
       EndWith
     EndIf
   EndProcedure
-  ProcedureDLL HTML_OpenSection(ID.l, *Style.S_HTML_Style_Paragraph)
+  ProcedureDLL HTML_OpenSection(ID.l, *Format.S_HTML_Style_Format = #Null, *Style.S_HTML_Style_Paragraph = #Null)
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    Protected sStyleFormat.s
     If *Object
       With *Object
-        \sHTMLBody + "<div>"
+        If *Format > #Null
+          If *Format\sFontColor > "" 
+            sStyleFormat + "font-color:" + *Format\sFontColor + ";"
+          EndIf
+          If *Format\sFontFamily > ""
+            sStyleFormat + "font-family:" + *Format\sFontFamily + ";"
+          EndIf
+          If *Format\lFontSize > #Null
+            sStyleFormat + "font-size:" + Str(*Format\lFontSize) + "px;"
+          EndIf
+          If *Format\lFontStyle > #Null
+            If *Format\lFontStyle & #PB_Font_Italic
+              *Format\lFontStyle - #PB_Font_Italic
+              sStyleFormat + "font-style:italic;"
+            EndIf
+            If *Format\lFontStyle & #PB_Font_Bold
+              *Format\lFontStyle - #PB_Font_Bold
+              sStyleFormat + "font-weight:bold;"
+            EndIf
+            If *Format\lFontStyle & #PB_Font_StrikeOut
+              *Format\lFontStyle - #PB_Font_StrikeOut
+              sStyleFormat + "font-style:strike-out;"
+            EndIf
+            If *Format\lFontStyle & #PB_Font_Underline
+              *Format\lFontStyle - #PB_Font_Underline
+              sStyleFormat + "text-decoration:underline;"
+            EndIf
+          EndIf
+          If *Format\sBackgroundColor > ""
+            sStyleFormat + " background-color:" + *Format\sBackgroundColor + ";"
+          EndIf
+        EndIf
+        If sStyleFormat > ""
+          \sHTMLBody + "<div style=" + #DQuote + sStyleFormat + #DQuote + ">"
+        Else
+          \sHTMLBody + "<div>"
+        EndIf
       EndWith
     EndIf
   EndProcedure
@@ -274,6 +348,59 @@ EndStructure
     If *Object
       With *Object
         \sHTMLBody + "</div>"
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_OpenBlock(ID.l, *Format.S_HTML_Style_Format = #Null, *Style.S_HTML_Style_Paragraph = #Null)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    Protected sStyleFormat.s
+    If *Object
+      With *Object
+        If *Format > #Null
+          If *Format\sFontColor > "" 
+            sStyleFormat + "font-color:" + *Format\sFontColor + ";"
+          EndIf
+          If *Format\sFontFamily > ""
+            sStyleFormat + "font-family:" + *Format\sFontFamily + ";"
+          EndIf
+          If *Format\lFontSize > #Null
+            sStyleFormat + "font-size:" + Str(*Format\lFontSize) + "px;"
+          EndIf
+          If *Format\lFontStyle > #Null
+            If *Format\lFontStyle & #PB_Font_Italic
+              *Format\lFontStyle - #PB_Font_Italic
+              sStyleFormat + "font-style:italic;"
+            EndIf
+            If *Format\lFontStyle & #PB_Font_Bold
+              *Format\lFontStyle - #PB_Font_Bold
+              sStyleFormat + "font-weight:bold;"
+            EndIf
+            If *Format\lFontStyle & #PB_Font_StrikeOut
+              *Format\lFontStyle - #PB_Font_StrikeOut
+              sStyleFormat + "font-style:strike-out;"
+            EndIf
+            If *Format\lFontStyle & #PB_Font_Underline
+              *Format\lFontStyle - #PB_Font_Underline
+              sStyleFormat + "text-decoration:underline;"
+            EndIf
+          EndIf
+          If *Format\sBackgroundColor > ""
+            sStyleFormat + " background-color:" + *Format\sBackgroundColor + ";"
+          EndIf
+        EndIf
+        If sStyleFormat > ""
+          \sHTMLBody + "<span style=" + #DQuote + sStyleFormat + #DQuote + ">"
+        Else
+          \sHTMLBody + "<span>"
+        EndIf
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_CloseBlock(ID.l)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sHTMLBody + "</span>"
       EndWith
     EndIf
   EndProcedure
