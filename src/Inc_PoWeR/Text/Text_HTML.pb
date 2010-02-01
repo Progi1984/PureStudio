@@ -44,6 +44,7 @@
   EndMacro
 ;}
 
+#DQuote = Chr(34)
 Enumeration
   #HTML_Alignment_Left
   #HTML_Alignment_Right
@@ -74,24 +75,85 @@ Structure S_HTML_Style_Format
   BackgroundColor.l
 EndStructure
 
-  Declare.l HTML_CloseFile(ID.l)
-  ProcedureDLL.l HTML_CreateFile(ID.l, Filename.s)
+  Declare HTML_CloseFile(ID.l)
+  ProcedureDLL HTML_CreateFile(ID.l, Filename.s)
     ; Initialization object
     If Objects_TextHtml = 0
       Objects_TextHtml = TextHtml_INIT(@HTML_CloseFile())
     EndIf
     ; CreateFile
     Protected *Object.S_TextHtml = TextHtml_NEW(ID)
-     With *Object
-        \sFilename = Filename
-     EndWith
+    With *Object
+      \sFilename = Filename
+    EndWith
     ProcedureReturn *Object
   EndProcedure
-  ProcedureDLL.l HTML_CloseFile(ID.l)
+  ProcedureDLL HTML_CloseFile(ID.l)
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    Protected plFile.l, plIncA.l
     ; CloseFile
     If *Object
-      
+      With *Object
+        plFile = CreateFile(#PB_Any, \sFilename)
+        If plFile
+          WriteStringN(plFile, "<html>")
+          WriteStringN(plFile, "<head>")
+          If \sTitle > ""
+            WriteStringN(plFile, "<title>" + \sTitle + "</title>")
+          EndIf
+          If \sAuthor > ""
+            WriteStringN(plFile, "<meta name="+#DQuote+"author"+#DQuote+" content="+#DQuote+\sAuthor+#DQuote+" />")
+          EndIf
+          If \sDescription > ""
+            WriteStringN(plFile, "<meta name="+#DQuote+"description"+#DQuote+" content="+#DQuote+\sDescription+#DQuote+" />")
+          EndIf
+          If \sGenerator > ""
+            WriteStringN(plFile, "<meta name="+#DQuote+"generator"+#DQuote+" content="+#DQuote+\sGenerator+#DQuote+" />")
+          EndIf
+          If \sKeyword > ""
+            WriteStringN(plFile, "<meta name="+#DQuote+"keywords"+#DQuote+" content="+#DQuote+\sKeyword+#DQuote+" />")
+          EndIf
+          If \lEncoding > 0
+            ; http://htmlhelp.com/tools/validator/supported-encodings.html.fr
+            Select \lEncoding
+              Case #PB_Ascii : WriteStringN(plFile, "<meta http-equiv="+#DQuote+"content-type"+#DQuote+" content=text/html; charset=ISO-8859-1"+#DQuote+" />")
+              Case #PB_UTF8 : WriteStringN(plFile, "<meta http-equiv="+#DQuote+"content-type"+#DQuote+" content=text/html; charset=UTF-8"+#DQuote+" />")     
+              Case #PB_UTF16 : WriteStringN(plFile, "<meta http-equiv="+#DQuote+"content-type"+#DQuote+" content=text/html; charset=UTF-16"+#DQuote+" />")     
+              Case #PB_UTF16BE : WriteStringN(plFile, "<meta http-equiv="+#DQuote+"content-type"+#DQuote+" content=text/html; charset=UTF-16BE"+#DQuote+" />")     
+            EndSelect
+          EndIf
+          ; javascript
+          If \lJavascriptFileCount > 0
+            WriteStringN(plFile, "<!-- js-file -->")
+            For plIncA = 0 To \lJavascriptFileCount
+              WriteStringN(plFile, "<script type="+#DQuote+"text/javascript"+#DQuote+" src="+#DQuote+\dimJavascriptFile[plIncA]+#DQuote+" />")
+            Next
+          EndIf
+          If \sJavascriptContent > ""
+            WriteStringN(plFile, "<!-- js-script -->")
+            WriteStringN(plFile, "<script type="+#DQuote+"text/javascript"+#DQuote+" src="+#DQuote+\dimJavascriptFile[plIncA]+#DQuote+">"+\sJavascriptContent+"</script>")
+          EndIf
+          ; css
+          If \lStylesheetFileCount > 0
+            WriteStringN(plFile, "<!-- css-file -->")
+            For plIncA = 0 To \lStylesheetFileCount
+              WriteStringN(plFile, "<link rel="+#DQuote+"stylesheet"+#DQuote+" href="+#DQuote+\dimStylesheetFile[plIncA]+#DQuote+" type="+#DQuote+"text/css"+#DQuote+">")
+            Next
+          EndIf
+          If \sStylesheetContent > ""
+            WriteStringN(plFile, "<!-- css-script -->")
+            WriteStringN(plFile, "<style type="+#DQuote+"text/css"+">"+\sStylesheetContent+"</style>")
+          EndIf
+          WriteStringN(plFile, "</head>")
+          WriteStringN(plFile, "<body>")
+          If \sHTMLBody > ""
+            WriteStringN(plFile, \sHTMLBody)
+          EndIf
+          WriteStringN(plFile, "</body>")
+          WriteStringN(plFile, "</html>")
+          CloseFile(plFile)
+        EndIf
+      EndWith
     EndIf
     ; Releasing object
     If *Object
@@ -187,7 +249,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + "<p>"
+        \sHTMLBody + "<p>"
       EndWith
     EndIf
   EndProcedure
@@ -195,7 +257,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + "</p>"
+        \sHTMLBody + "</p>"
       EndWith
     EndIf
   EndProcedure
@@ -203,7 +265,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + "<div>"
+        \sHTMLBody + "<div>"
       EndWith
     EndIf
   EndProcedure
@@ -211,7 +273,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + "</div>"
+        \sHTMLBody + "</div>"
       EndWith
     EndIf
   EndProcedure
@@ -220,7 +282,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + "<table>"
+        \sHTMLBody + "<table>"
       EndWith
     EndIf
   EndProcedure
@@ -228,7 +290,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + "</table>"
+        \sHTMLBody + "</table>"
       EndWith
     EndIf
   EndProcedure
@@ -236,7 +298,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + "<thead>"
+        \sHTMLBody + "<thead>"
       EndWith
     EndIf
   EndProcedure
@@ -244,7 +306,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + "</thead>"
+        \sHTMLBody + "</thead>"
       EndWith
     EndIf
   EndProcedure
@@ -252,7 +314,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + "<tbody>"
+        \sHTMLBody + "<tbody>"
       EndWith
     EndIf
   EndProcedure
@@ -260,7 +322,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + "</tbody>"
+        \sHTMLBody + "</tbody>"
       EndWith
     EndIf
   EndProcedure
@@ -268,7 +330,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + "<tr>"
+        \sHTMLBody + "<tr>"
       EndWith
     EndIf
   EndProcedure
@@ -276,7 +338,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + "</tr>"
+        \sHTMLBody + "</tr>"
       EndWith
     EndIf
   EndProcedure
@@ -284,7 +346,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + "<td>"
+        \sHTMLBody + "<td>"
       EndWith
     EndIf
   EndProcedure
@@ -292,7 +354,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + "</td>"
+        \sHTMLBody + "</td>"
       EndWith
     EndIf
   EndProcedure
@@ -301,7 +363,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + "<ul>"
+        \sHTMLBody + "<ul>"
       EndWith
     EndIf
   EndProcedure
@@ -309,7 +371,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-       \sBody + "</ul>" 
+       \sHTMLBody + "</ul>" 
       EndWith
     EndIf
   EndProcedure
@@ -317,7 +379,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + "<li>" + Text + "</li>"
+        \sHTMLBody + "<li>" + Text + "</li>"
       EndWith
     EndIf
   EndProcedure
@@ -326,7 +388,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + "<img src="+Chr(34)+Filename+Chr(34)+" />"
+        \sHTMLBody + "<img src="+Chr(34)+Filename+Chr(34)+" />"
       EndWith
     EndIf
   EndProcedure
@@ -334,7 +396,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + "<br />"
+        \sHTMLBody + "<br />"
       EndWith
     EndIf
   EndProcedure
@@ -342,7 +404,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + Text
+        \sHTMLBody + Text
       EndWith
     EndIf
   EndProcedure
@@ -350,7 +412,7 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + Text
+        \sHTMLBody + Text
       EndWith
     EndIf
   EndProcedure
@@ -358,9 +420,17 @@ EndStructure
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
-        \sBody + "<h"+Str(HeaderLevel)+">"
-        \sBody + Text
-        \sBody + "</h"+Str(HeaderLevel)+">"
+        \sHTMLBody + "<h"+Str(HeaderLevel)+">"
+        \sHTMLBody + Text
+        \sHTMLBody + "</h"+Str(HeaderLevel)+">"
+      EndWith
+    EndIf
+  EndProcedure
+  ProcedureDLL HTML_AddComment(ID.l, Comment.s)
+    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+    If *Object
+      With *Object
+        \sHTMLBody + "<!-- "+Comment+" -->"
       EndWith
     EndIf
   EndProcedure

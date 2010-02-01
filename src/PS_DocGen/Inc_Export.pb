@@ -1,6 +1,6 @@
 ProcedureDLL DocGen_Export(lType.l, sPath.s)
   Select lType
-    Case #ExportType_CHM
+    Case #ExportType_CHM              : DocGen_ExportCHM(sPath)
     Case #ExportType_DOC_97
     Case #ExportType_DOC_2003
     Case #ExportType_DocBook

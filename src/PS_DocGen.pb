@@ -12,11 +12,14 @@ IncludePath "Inc_System"
 IncludePath "PS_DocGen"
   XIncludeFile "Inc_Var.pb"
   XIncludeFile "Inc_Parser.pb"
-  XIncludeFile "Inc_Export.pb"
   XIncludeFile "Inc_Export_CHM.pb"
+  XIncludeFile "Inc_Export.pb"
   XIncludeFile "Main.pb"
 
 gsMainFile = "/home/franklin/Documents/Projets/Moebius/Moebius_Main.pb"
+AddElement(LL_Exports())
+LL_Exports()\lType             = #ExportType_CHM
+LL_Exports()\sPathExport  = "/home/franklin/Documents/Projets/PureStudio/data/PS_DocGen_CHM/"
 If FileSize(gsMainFile) > 0
   Main_DocGen()
 Else
