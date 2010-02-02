@@ -527,7 +527,7 @@ EndStructure
       EndWith
     EndIf
   EndProcedure
-  ProcedureDLL HTML_AddText(ID.l, Text.s, *Style.S_HTML_Style_Format)
+  ProcedureDLL HTML_AddText(ID.l, Text.s, *Style.S_HTML_Style_Format = #Null)
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
