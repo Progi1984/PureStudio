@@ -16,15 +16,8 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
     ForEach LL_ListProcedures()
       With LL_ListProcedures()
         Debug "-----START"
-        Debug \bIsC.b
-        Debug \bIsDLL.b
-        Debug \sProcedure.s
-        Debug \sName.s
-        Debug \sType.s
-        Debug \sParameterName.s
-        Debug \sParameterType.s
-        Debug \sDescription.s
-        Debug \ptrInclude.l
+        DocGen_ParserDoc(\sDescription, @LL_ListProcedures()\ptrDoc)
+        Debug \ptrDoc\sAuthor
         Debug "-----END"
         lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "Functions\"+ \sName + ".html")
         ; head 

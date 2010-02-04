@@ -1,4 +1,11 @@
 ;- Structures
+Structure S_Documentation
+  sAuthor.s
+  sDescription.s
+  sReturnValue.s
+  sUrl.s
+  sSample.s
+EndStructure
 Structure S_TypeExport
   lType.l
   sPathExport.s
@@ -54,6 +61,7 @@ Structure S_TypeProcedure
   sParameterType.s
   sDescription.s
   sContent.s
+  ptrDoc.S_Documentation
   ptrInclude.l
 EndStructure
 
@@ -220,7 +228,7 @@ If CreateRegularExpression(#Regex_ProcedureParameterType, "(?<=(\.))[A-Za-z0-9\_
   End
 EndIf
 ;@desc : Regex for detecting doc
-If CreateRegularExpression(#Regex_Doc, "(?<=(;@\s)).+") = #False
+If CreateRegularExpression(#Regex_Doc, "(?<=(;@)).+") = #False
   MR_Error("REGEX : Doc > " + RegularExpressionError())
   End
 EndIf
