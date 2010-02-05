@@ -70,12 +70,47 @@ EndStructure
 Structure S_HTML_Style_Format
   sFontColor.s
   sFontFamily.s
-  lFontSize.l
-  lFontStyle.l
+  sFontSize.s
+  bFontStyleBold.b
+  bFontStyleItalic.b
+  bFontStyleStrikeout.b
+  bFontStyleUnderline.b
   sBackgroundColor.s
 EndStructure
 
   Declare HTML_CloseFile(ID.l)
+  Procedure.s HTML_ReturnCSSFormat(*Format.S_HTML_Style_Format)
+    Protected sStyleFormat.s
+    If *Format <> #Null
+      If *Format\sFontColor > "" 
+        sStyleFormat + "color:" + *Format\sFontColor + ";"
+      EndIf
+      If *Format\sFontFamily > ""
+        sStyleFormat + "font-family:" + *Format\sFontFamily + ";"
+      EndIf
+      If *Format\sFontSize > ""
+        sStyleFormat + "font-size:" + *Format\sFontSize + ";"
+      EndIf
+      If *Format\bFontStyleBold
+        sStyleFormat + "font-weight:bold;"
+      EndIf
+      If *Format\bFontStyleItalic
+        sStyleFormat + "font-style:italic;"
+      EndIf
+      If *Format\bFontStyleStrikeout
+        sStyleFormat + "font-style:strikeout;"
+      EndIf
+      If *Format\bFontStyleUnderline
+        sStyleFormat + "font-decoration:underline;"
+      EndIf
+      If *Format\sBackgroundColor > ""
+        sStyleFormat + "background-color:" + *Format\sBackgroundColor + ";"
+      EndIf
+    EndIf
+    ProcedureReturn sStyleFormat
+  EndProcedure
+  
+  
   ProcedureDLL HTML_CreateFile(ID.l, Filename.s)
     ; Initialization object
     If Objects_TextHtml = 0
@@ -142,7 +177,7 @@ EndStructure
           EndIf
           If \sStylesheetContent > ""
             WriteStringN(plFile, "<!-- css-script -->")
-            WriteStringN(plFile, "<style type="+#DQuote+"text/css"+">"+\sStylesheetContent+"</style>")
+            WriteStringN(plFile, "<style type="+#DQuote+"text/css"+#DQuote+">"+\sStylesheetContent+"</style>")
           EndIf
           WriteStringN(plFile, "</head>")
           WriteStringN(plFile, "<body>")
@@ -250,38 +285,7 @@ EndStructure
     Protected sStyleFormat.s
     If *Object
       With *Object
-        If *Format > #Null
-          If *Format\sFontColor > "" 
-            sStyleFormat + "font-color:" + *Format\sFontColor + ";"
-          EndIf
-          If *Format\sFontFamily > ""
-            sStyleFormat + "font-family:" + *Format\sFontFamily + ";"
-          EndIf
-          If *Format\lFontSize > #Null
-            sStyleFormat + "font-size:" + Str(*Format\lFontSize) + "px;"
-          EndIf
-          If *Format\lFontStyle > #Null
-            If *Format\lFontStyle & #PB_Font_Italic
-              *Format\lFontStyle - #PB_Font_Italic
-              sStyleFormat + "font-style:italic;"
-            EndIf
-            If *Format\lFontStyle & #PB_Font_Bold
-              *Format\lFontStyle - #PB_Font_Bold
-              sStyleFormat + "font-weight:bold;"
-            EndIf
-            If *Format\lFontStyle & #PB_Font_StrikeOut
-              *Format\lFontStyle - #PB_Font_StrikeOut
-              sStyleFormat + "font-style:strike-out;"
-            EndIf
-            If *Format\lFontStyle & #PB_Font_Underline
-              *Format\lFontStyle - #PB_Font_Underline
-              sStyleFormat + "text-decoration:underline;"
-            EndIf
-          EndIf
-          If *Format\sBackgroundColor > ""
-            sStyleFormat + " background-color:" + *Format\sBackgroundColor + ";"
-          EndIf
-        EndIf
+        sStyleFormat = HTML_ReturnCSSFormat(*Format)
         If sStyleFormat > ""
           \sHTMLBody + "<p style=" + #DQuote + sStyleFormat + #DQuote + ">"
         Else
@@ -303,38 +307,7 @@ EndStructure
     Protected sStyleFormat.s
     If *Object
       With *Object
-        If *Format > #Null
-          If *Format\sFontColor > "" 
-            sStyleFormat + "font-color:" + *Format\sFontColor + ";"
-          EndIf
-          If *Format\sFontFamily > ""
-            sStyleFormat + "font-family:" + *Format\sFontFamily + ";"
-          EndIf
-          If *Format\lFontSize > #Null
-            sStyleFormat + "font-size:" + Str(*Format\lFontSize) + "px;"
-          EndIf
-          If *Format\lFontStyle > #Null
-            If *Format\lFontStyle & #PB_Font_Italic
-              *Format\lFontStyle - #PB_Font_Italic
-              sStyleFormat + "font-style:italic;"
-            EndIf
-            If *Format\lFontStyle & #PB_Font_Bold
-              *Format\lFontStyle - #PB_Font_Bold
-              sStyleFormat + "font-weight:bold;"
-            EndIf
-            If *Format\lFontStyle & #PB_Font_StrikeOut
-              *Format\lFontStyle - #PB_Font_StrikeOut
-              sStyleFormat + "font-style:strike-out;"
-            EndIf
-            If *Format\lFontStyle & #PB_Font_Underline
-              *Format\lFontStyle - #PB_Font_Underline
-              sStyleFormat + "text-decoration:underline;"
-            EndIf
-          EndIf
-          If *Format\sBackgroundColor > ""
-            sStyleFormat + " background-color:" + *Format\sBackgroundColor + ";"
-          EndIf
-        EndIf
+        sStyleFormat = HTML_ReturnCSSFormat(*Format)
         If sStyleFormat > ""
           \sHTMLBody + "<div style=" + #DQuote + sStyleFormat + #DQuote + ">"
         Else
@@ -356,38 +329,7 @@ EndStructure
     Protected sStyleFormat.s
     If *Object
       With *Object
-        If *Format > #Null
-          If *Format\sFontColor > "" 
-            sStyleFormat + "font-color:" + *Format\sFontColor + ";"
-          EndIf
-          If *Format\sFontFamily > ""
-            sStyleFormat + "font-family:" + *Format\sFontFamily + ";"
-          EndIf
-          If *Format\lFontSize > #Null
-            sStyleFormat + "font-size:" + Str(*Format\lFontSize) + "px;"
-          EndIf
-          If *Format\lFontStyle > #Null
-            If *Format\lFontStyle & #PB_Font_Italic
-              *Format\lFontStyle - #PB_Font_Italic
-              sStyleFormat + "font-style:italic;"
-            EndIf
-            If *Format\lFontStyle & #PB_Font_Bold
-              *Format\lFontStyle - #PB_Font_Bold
-              sStyleFormat + "font-weight:bold;"
-            EndIf
-            If *Format\lFontStyle & #PB_Font_StrikeOut
-              *Format\lFontStyle - #PB_Font_StrikeOut
-              sStyleFormat + "font-style:strike-out;"
-            EndIf
-            If *Format\lFontStyle & #PB_Font_Underline
-              *Format\lFontStyle - #PB_Font_Underline
-              sStyleFormat + "text-decoration:underline;"
-            EndIf
-          EndIf
-          If *Format\sBackgroundColor > ""
-            sStyleFormat + " background-color:" + *Format\sBackgroundColor + ";"
-          EndIf
-        EndIf
+        sStyleFormat = HTML_ReturnCSSFormat(*Format)
         If sStyleFormat > ""
           \sHTMLBody + "<span style=" + #DQuote + sStyleFormat + #DQuote + ">"
         Else
@@ -502,7 +444,7 @@ EndStructure
       EndWith
     EndIf
   EndProcedure
-  ProcedureDLL HTML_AddListElement(ID.l, Text.s)
+  ProcedureDLL HTML_AddElement(ID.l, Text.s)
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object
@@ -519,7 +461,7 @@ EndStructure
       EndWith
     EndIf
   EndProcedure
-  ProcedureDLL HTML_AddNewLine()
+  ProcedureDLL HTML_AddNewLine(ID.l)
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     If *Object
       With *Object

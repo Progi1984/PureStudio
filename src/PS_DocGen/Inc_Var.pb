@@ -2,8 +2,8 @@
 Structure S_Documentation
   sAuthor.s
   sDescription.s
-  sReturnValue.s
-  sUrl.s
+  sReturn.s
+  sLink.s
   sSample.s
 EndStructure
 Structure S_TypeExport

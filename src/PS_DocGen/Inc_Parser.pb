@@ -403,20 +403,32 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
     MR_Error("Can't open the file : "+#DQuote+sFilename+#DQuote)
   EndIf
 EndProcedure
-
 ProcedureDLL DocGen_ParserDoc(sDocumentation.s, *PtrDoc.S_Documentation)
+  Protected sPart.s, sTag.s, sAttribute.s
+  Protected lIncA.l
   sDocumentation = Trim(sDocumentation)
-  sDocumentation = ReplaceString(sDocumentation, Chr(13), "")
-  sDocumentation = ReplaceString(sDocumentation, Chr(10), "")
-  sDocumentation = ReplaceString(sDocumentation, "@+", " <br />")
-  For i = 0 To CountString(sDocumentation, "@")
-    sPart.s = StringField(sDocumentation, i+1, "@") 
-    sTitle.s = StringField(sPart, 1, " ")
-    ; sPart
-    ; sTitle
-    ; Trim(Right(sPart, Len(sPart) - Len(sTitle) - 1))
-    ; "++++++++"
+  sDocumentation = ReplaceString(sDocumentation, "@+", " ")
+  For lIncA = 1 To CountString(sDocumentation, "@")
+    sPart = StringField(sDocumentation, lIncA+1, "@")
+    sTag = StringField(sPart, 1, " ")
+    sTag = ReplaceString(sTag, Chr(13) + Chr(10), "")
+    sTag = ReplaceString(sTag, Chr(10), "")
+    sAttribute = Trim(Right(sPart, Len(sPart) - Len(sTag) - 1))
+    If Left(sAttribute, 1) = ":"
+      sAttribute = Trim(Right(sAttribute, Len(sAttribute) - 1))
+    EndIf
+    If Right(sAttribute, 1) = ":"
+      sAttribute = Trim(Left(sAttribute, Len(sAttribute) - 1))
+    EndIf
+    sAttribute = ReplaceString(sAttribute, Chr(13) + Chr(10), "<br />")
+    sAttribute = ReplaceString(sAttribute, Chr(10), "<br />")
+    Select sTag
+      Case "author" : *PtrDoc\sAuthor = sAttribute
+      Case "desc" : *PtrDoc\sDescription  = sAttribute
+      Case "link" : *PtrDoc\sLink = sAttribute
+      Case "return" : *PtrDoc\sReturn = sAttribute
+      Case "sample" : *PtrDoc\sSample = sAttribute
+      Default : Debug ">>>" + sTag + " ! " + sAttribute : CallDebugger
+    EndSelect
   Next
-  ; sDocumentation.s
-  *PtrDoc\sAuthor = "Test"
 EndProcedure
