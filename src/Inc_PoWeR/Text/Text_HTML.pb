@@ -45,27 +45,35 @@
 ;}
 
 #DQuote = Chr(34)
-Enumeration
+Enumeration 1 ; HTML_Alignment
   #HTML_Alignment_Left
   #HTML_Alignment_Right
   #HTML_Alignment_Center
   #HTML_Alignment_Justify
 EndEnumeration
-Enumeration
+Enumeration 1 ; HTML_Extern
   #HTML_Extern_Javascript
   #HTML_Extern_CSS
 EndEnumeration
 Structure S_HTML_Side
-  Bottom.l
-  Top.l
-  Left.l
-  Right.l
+  sBottom.s
+  sTop.s
+  sLeft.s
+  sRight.s
 EndStructure
 Structure S_HTML_Style_Paragraph
-  Alignment.l
-  Padding.S_HTML_Side
-  Border.S_HTML_Side
-  BorderStyle.S_HTML_Side
+  lAlignment.l
+  S_Padding.S_HTML_Side
+  S_Margin.S_HTML_Side
+  S_Border.S_HTML_Side
+  S_BorderStyle.S_HTML_Side
+  S_BorderColor.S_HTML_Side
+  ; Enable / Disable
+  bPadding.b
+  bMargin.b
+  bBorder.b
+  bBorderStyle.b
+  bBorderColor.b
 EndStructure
 Structure S_HTML_Style_Format
   sFontColor.s
@@ -109,7 +117,92 @@ EndStructure
     EndIf
     ProcedureReturn sStyleFormat
   EndProcedure
-  
+  Procedure.s HTML_ReturnCSSParagraph(*Format.S_HTML_Style_Paragraph)
+    Protected sStyleFormat.s
+    If *Format <> #Null
+      With *Format
+        If \lAlignment > #Null
+          Select \Alignment
+            Case #HTML_Alignment_Left : sStyleFormat + "text-align:left;"
+            Case #HTML_Alignment_Right : sStyleFormat + "text-align:center;"
+            Case #HTML_Alignment_Center : sStyleFormat + "text-align:right;"
+            Case #HTML_Alignment_Justify : sStyleFormat + "text-align:justify;"
+          EndSelect
+        EndIf
+        If \bPadding = #True
+          If \S_Padding\sBottom > ""
+            sStyleFormat + "padding-bottom:"+\S_Padding\sBottom+";"
+          EndIf
+          If \S_Padding\sTop > ""
+            sStyleFormat + "padding-top:"+\S_Padding\sTop+";"
+          EndIf
+          If \S_Padding\sLeft > ""
+            sStyleFormat + "padding-left:"+\S_Padding\sLeft+";"
+          EndIf
+          If \S_Padding\sRight > ""
+            sStyleFormat + "padding-right:"+\S_Padding\sRight+";"
+          EndIf
+        EndIf
+        If \bMargin = #True
+          If \S_Margin\sBottom > ""
+            sStyleFormat + "margin-bottom:"+\S_Margin\sBottom+";"
+          EndIf
+          If \S_Margin\sTop > ""
+            sStyleFormat + "margin-top:"+\S_Margin\sTop+";"
+          EndIf
+          If \S_Margin\sLeft > ""
+            sStyleFormat + "margin-left:"+\S_Margin\sLeft+";"
+          EndIf
+          If \S_Margin\sRight > ""
+            sStyleFormat + "margin-right:"+\S_Margin\sRight+";"
+          EndIf
+        EndIf
+        If \bBorder = #True
+          If \S_Border\sBottom > ""
+            sStyleFormat + "border-bottom-width:"+\S_Border\sBottom+";"
+          EndIf
+          If \S_Border\sTop > ""
+            sStyleFormat + "border-top-width:"+\S_Border\sTop+";"
+          EndIf
+          If \S_Border\sLeft > ""
+            sStyleFormat + "border-left-width:"+\S_Border\sLeft+";"
+          EndIf
+          If \S_Border\sRight > ""
+            sStyleFormat + "border-right-width:"+\S_Border\sRight+";"
+          EndIf
+        EndIf
+        If \bBorderStyle = #True
+          If \S_BorderStyle\sBottom > ""
+            sStyleFormat + "border-bottom-style:"+\S_BorderStyle\sBottom+";"
+          EndIf
+          If \S_BorderStyle\sTop > ""
+            sStyleFormat + "border-top-style:"+\S_BorderStyle\sTop+";"
+          EndIf
+          If \S_BorderStyle\sLeft > ""
+            sStyleFormat + "border-left-style:"+\S_BorderStyle\sLeft+";"
+          EndIf
+          If \S_BorderStyle\sRight > ""
+            sStyleFormat + "border-right-style:"+\S_BorderStyle\sRight+";"
+          EndIf
+        EndIf
+        If \bBorderColor = #True
+          If \S_BorderColor\sBottom > ""
+            sStyleFormat + "border-bottom-color:"+\S_BorderColor\sBottom+";"
+          EndIf
+          If \S_BorderColor\sTop > ""
+            sStyleFormat + "border-top-color:"+\S_BorderColor\sTop+";"
+          EndIf
+          If \S_BorderColor\sLeft > ""
+            sStyleFormat + "border-left-color:"+\S_BorderColor\sLeft+";"
+          EndIf
+          If \S_BorderColor\sRight > ""
+            sStyleFormat + "border-right-color:"+\S_BorderColor\sRight+";"
+          EndIf
+        EndIf
+        EndIf
+      EndWith
+    EndIf
+  EndProcedure
   
   ProcedureDLL HTML_CreateFile(ID.l, Filename.s)
     ; Initialization object
