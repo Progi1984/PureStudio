@@ -122,7 +122,7 @@ EndStructure
     If *Format <> #Null
       With *Format
         If \lAlignment > #Null
-          Select \Alignment
+          Select \lAlignment
             Case #HTML_Alignment_Left : sStyleFormat + "text-align:left;"
             Case #HTML_Alignment_Right : sStyleFormat + "text-align:center;"
             Case #HTML_Alignment_Center : sStyleFormat + "text-align:right;"
@@ -199,9 +199,9 @@ EndStructure
             sStyleFormat + "border-right-color:"+\S_BorderColor\sRight+";"
           EndIf
         EndIf
-        EndIf
       EndWith
     EndIf
+    ProcedureReturn sStyleFormat
   EndProcedure
   
   ProcedureDLL HTML_CreateFile(ID.l, Filename.s)
@@ -379,6 +379,7 @@ EndStructure
     If *Object
       With *Object
         sStyleFormat = HTML_ReturnCSSFormat(*Format)
+        sStyleFormat + HTML_ReturnCSSParagraph(*Style)
         If sStyleFormat > ""
           \sHTMLBody + "<p style=" + #DQuote + sStyleFormat + #DQuote + ">"
         Else
@@ -401,6 +402,7 @@ EndStructure
     If *Object
       With *Object
         sStyleFormat = HTML_ReturnCSSFormat(*Format)
+        sStyleFormat + HTML_ReturnCSSParagraph(*Style)
         If sStyleFormat > ""
           \sHTMLBody + "<div style=" + #DQuote + sStyleFormat + #DQuote + ">"
         Else
@@ -423,6 +425,7 @@ EndStructure
     If *Object
       With *Object
         sStyleFormat = HTML_ReturnCSSFormat(*Format)
+        sStyleFormat + HTML_ReturnCSSParagraph(*Style)
         If sStyleFormat > ""
           \sHTMLBody + "<span style=" + #DQuote + sStyleFormat + #DQuote + ">"
         Else
