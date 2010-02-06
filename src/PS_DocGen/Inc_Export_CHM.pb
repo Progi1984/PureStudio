@@ -29,15 +29,15 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
       HTML_SetTitle(lFileIDHTML, "Functions")
       HTML_AddInternFile(lFileIDHTML, #HTML_Extern_CSS, psCSSforHTML)
       HTML_AddHeader(lFileIDHTML, 1, "Functions")
-      HTML_OpenSection(lFileIDHTML)
-        HTML_OpenList(lFileIDHTML)
-          ForEach LL_ListProcedures()
-            With LL_ListProcedures()
-              HTML_AddElement(lFileIDHTML, "<a href=" + #DQuote + "Functions/"+ \sName + ".html" + #DQuote + ">" + \sName + "</a>")
-            EndWith
-          Next
-        HTML_CloseList(lFileIDHTML)
-      HTML_CloseSection(lFileIDHTML)
+      HTML_AddHeader(lFileIDHTML, 2, "Command Index")
+      HTML_OpenParagraph(lFileIDHTML)
+        ForEach LL_ListProcedures()
+          With LL_ListProcedures()
+            HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "Functions/"+ \sName + ".html" + #DQuote + ">" + \sName + "</a>")
+            HTML_AddNewLine(lFileIDHTML)
+          EndWith
+        Next
+      HTML_CloseParagraph(lFileIDHTML)
     HTML_CloseFile(lFileIDHTML)
   ;}
   CreateDirectory(sPath + "Functions")
