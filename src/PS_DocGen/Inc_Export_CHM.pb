@@ -3,7 +3,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   Protected psCSSforHTML.s, psContent.s
   Protected pFormatBody.S_HTML_Style_Format
   Protected pFormatP.S_HTML_Style_Format
-  Protected pFormatParagraph.S_HTML_Style_Format
+  Protected pStyleP.S_HTML_Style_Paragraph
   Protected pFormatProcedureName.S_HTML_Style_Format
   
   pFormatBody\sFontFamily = "Arial"
@@ -14,12 +14,14 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   
   pFormatP\sFontSize = "0.8em"
   pFormatP\sFontFamily = "Arial"
+  pStyleP\bMargin = #True
+  pStyleP\S_Margin\sLeft = "40px"
   
   psCSSforHTML = "body {"+HTML_ReturnCSSFormat(@pFormatBody)+"}" + #System_EOL
   psCSSforHTML + "h1 {font-family:arial; text-align:center; font-size: 1.1em; font-weight: bold;}" + #System_EOL
   psCSSforHTML + "h2 {font-family:arial; font-weight: bold; font-size: 0.8em;} " + #System_EOL
   psCSSforHTML + "a {font-family:Arial; color:#009999;}" + #System_EOL
-  psCSSforHTML + "p {"+HTML_ReturnCSSFormat(@pFormatP)+"}" + #System_EOL
+  psCSSforHTML + "p {"+HTML_ReturnCSSFormat(@pFormatP)+HTML_ReturnCSSParagraph(@pStyleP)+"}" + #System_EOL
   ;psCSSforHTML + "" + #System_EOL
  
   
