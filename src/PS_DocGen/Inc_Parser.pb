@@ -53,7 +53,7 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
                 AddElement(LL_ListStructures())
                 With LL_ListStructures()
                   \ptrInclude = ptrInclude
-                  \sName = ResRegex(0)
+                  \sName = Trim(ResRegex(0))
                   \sDescription = psDoc
                   ; Debug "Structure > " + ResRegex(0)
                 EndWith
@@ -317,6 +317,19 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
               If FindString(LCase(psLine), "endstructureunion", 0) = 0
                 pbInMultiline = #False
                 pbInStructure = #False
+              Else
+                With LL_ListStructures()
+                  If \sField = ""
+                    \sField = "EndStructureUnion"
+                  Else
+                    \sField + "|EndStructureUnion"
+                  EndIf
+                  If \sFieldDescription = ""
+                    \sFieldDescription = ""
+                  Else
+                    \sFieldDescription + "|"
+                  EndIf
+                EndWith
               EndIf
             EndIf
           EndIf
