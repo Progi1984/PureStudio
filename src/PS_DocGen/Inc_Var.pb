@@ -19,36 +19,42 @@ Structure S_TypeStructure
   sDescription.s
   sField.s
   sFieldDescription.s
+  ptrDoc.S_Documentation
   ptrInclude.l
 EndStructure
 Structure S_TypeEnum
   sDescription.s
   sField.s
   sFieldDescription.s
+  ptrDoc.S_Documentation
   ptrInclude.l
 EndStructure
 Structure S_TypeMacro
   sName.s
   sDescription.s
   sContent.s
+  ptrDoc.S_Documentation
   ptrInclude.l
 EndStructure
 Structure S_TypeArray
   sName.s
   sDescription.s
   bIsGlobal.b
+  ptrDoc.S_Documentation
   ptrInclude.l
 EndStructure
 Structure S_TypeLinkedList
   sName.s
   sDescription.s
   bIsGlobal.b
+  ptrDoc.S_Documentation
   ptrInclude.l
 EndStructure
 Structure S_TypeConstant
   sName.s
   sValue.s
   sDescription.s
+  ptrDoc.S_Documentation
   ptrInclude.l
 EndStructure
 Structure S_TypeProcedure
