@@ -241,6 +241,59 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   ;}
 
   ; Tableaux
+  ;- TODO : Arrays > Pointer la structure de la LL vers la page web de la structure
+  ;- TODO : Arrays > Retour à la page d'accueil
+  ;- TODO : Arrays > Taille du tableau (si constante, donne la valeur et pointe vers la page web de la structure)
+  ;{ Export HTML > All Arrays
+    lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "Arrays.html")
+      HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
+      HTML_SetTitle(lFileIDHTML, "Arrays")
+      HTML_AddInternFile(lFileIDHTML, #HTML_Extern_CSS, psCSSforHTML)
+      HTML_AddHeader(lFileIDHTML, 1, "Arrays")
+      HTML_AddHeader(lFileIDHTML, 2, "Arrays Index")
+      HTML_OpenParagraph(lFileIDHTML)
+        ForEach LL_ListArrays()
+          With LL_ListArrays()
+            HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "Arrays/"+ StringField(\sName, 1, ".") + ".html" + #DQuote + ">" + \sName + "</a>")
+            HTML_AddNewLine(lFileIDHTML)
+          EndWith
+        Next
+      HTML_CloseParagraph(lFileIDHTML)
+    HTML_CloseFile(lFileIDHTML)
+  ;}
+  ;{ Export HTML > Array
+    CreateDirectory(sPath + "Arrays")
+    ForEach LL_ListArrays()
+      With LL_ListArrays()
+        DocGen_ParserDoc(\sDescription, @LL_ListArrays()\ptrDoc)
+        lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "Arrays"+ #System_Separator + StringField(\sName, 1, ".") + ".html")
+        ; head 
+        HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
+        HTML_SetTitle(lFileIDHTML, StringField(\sName, 1, "."))
+        HTML_AddInternFile(lFileIDHTML, #HTML_Extern_CSS, psCSSforHTML)
+        ; body
+        HTML_AddHeader(lFileIDHTML, 1, StringField(\sName, 1, "."))
+        ;{ Syntax
+          HTML_AddHeader(lFileIDHTML, 2, "Syntax")
+          HTML_OpenParagraph(lFileIDHTML)
+            HTML_OpenBlock(lFileIDHTML, @pFormatProcedureName)
+              HTML_AddText(lFileIDHTML, \sName)
+            HTML_CloseBlock(lFileIDHTML)
+          HTML_CloseParagraph(lFileIDHTML)
+        ;}
+        ;{ Description
+          If \PtrDoc\sDescription > ""
+            HTML_AddHeader(lFileIDHTML, 2, "Description")
+            HTML_OpenParagraph(lFileIDHTML)
+              HTML_AddText(lFileIDHTML, \PtrDoc\sDescription)
+            HTML_CloseParagraph(lFileIDHTML)
+          EndIf
+        ;}
+        HTML_CloseFile(lFileIDHTML)
+        lFileIDHTML = 0
+      EndWith
+    Next
+  ;}
   ; Macros
   ; Enumerations
   ; Structures

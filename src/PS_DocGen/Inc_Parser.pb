@@ -112,7 +112,7 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
                 AddElement(LL_ListArrays())
                 With LL_ListArrays()
                   \ptrInclude = ptrInclude
-                  \sName = ResRegex(0)
+                  \sName = Trim(ResRegex(0))
                   \sDescription = psDoc
                   plNbResults = ExtractRegularExpression(#Regex_Doc, psContent, ResRegex())
                   If plNbResults = 1
