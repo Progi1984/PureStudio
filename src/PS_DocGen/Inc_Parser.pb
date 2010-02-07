@@ -94,7 +94,7 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
                 AddElement(LL_ListMacros())
                 With LL_ListMacros()
                   \ptrInclude = ptrInclude
-                  \sName = ResRegex(0)
+                  \sName = Trim(ResRegex(0))
                   \sContent = psContent
                   \sDescription = psDoc
                   ; Debug "Macro > " + ResRegex(0)
@@ -326,10 +326,10 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
               plNbResults = ExtractRegularExpression(#Regex_CommentBefore, psLine, ResRegex())
               If plNbResults = 1
                 With LL_ListEnumerations()
-                  If \sField = ""
-                    \sField = ResRegex(0)
+                  If \sItem = ""
+                    \sItem = ResRegex(0)
                   Else
-                    \sField + "|"+ ResRegex(0)
+                    \sItem + "|"+ ResRegex(0)
                   EndIf
                   ; Debug "Field > "+ ResRegex(0)
                 EndWith
@@ -340,11 +340,11 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
                 If ResRegex(0) = "" 
                   ResRegex(0) = " "
                 EndIf
-                With LL_ListStructures()
-                  If \sFieldDescription = ""
-                    \sFieldDescription = ResRegex(0)
+                With LL_ListEnumerations()
+                  If \sItemDescription = ""
+                    \sItemDescription = ResRegex(0)
                   Else
-                    \sFieldDescription + "|"+ ResRegex(0)
+                    \sItemDescription + "|"+ ResRegex(0)
                   EndIf
                 EndWith
               EndIf

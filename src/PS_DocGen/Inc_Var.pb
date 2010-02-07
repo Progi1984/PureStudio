@@ -24,8 +24,8 @@ Structure S_TypeStructure
 EndStructure
 Structure S_TypeEnum
   sDescription.s
-  sField.s
-  sFieldDescription.s
+  sItem.s
+  sItemDescription.s
   ptrDoc.S_Documentation
   ptrInclude.l
 EndStructure
