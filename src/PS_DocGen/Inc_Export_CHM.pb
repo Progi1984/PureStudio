@@ -26,6 +26,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   ; Procedures
   ;- TODO : Procedures > Retour à la page d'accueil
   ;- TODO : Procedures > Source : ajouter le nom, les paramètres et le type
+  ;- TODO : Procedures > Ordre Alphabétique
   ;{ Export HTML > All Procedures
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "Functions.html")
       HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
@@ -126,6 +127,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   ; Constantes
   ;- TODO : Constants > Vérifier l'existence des constantes dans la LL
   ;- TODO : Constants > Ne pas prendre les constantes en PB_
+  ;- TODO : Constants > Ordre Alphabétique
   ;- TODO : Constants > Retour à la page d'accueil
   ;{ Export HTML > All Constants
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "Constants.html")
@@ -189,6 +191,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   ; Listes Chainées
   ;- TODO : LinkedLists > Pointer la structure de la LL vers la page web de la structure
   ;- TODO : LinkedLists > Retour à la page d'accueil
+  ;- TODO : LinkedLists > Ordre Alphabétique
   ;{ Export HTML > All LinkedLists
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "LinkedLists.html")
       HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
@@ -243,6 +246,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   ; Tableaux
   ;- TODO : Arrays > Pointer la structure de la LL vers la page web de la structure
   ;- TODO : Arrays > Retour à la page d'accueil
+  ;- TODO : Arrays > Ordre Alphabétique
   ;- TODO : Arrays > Taille du tableau (si constante, donne la valeur et pointe vers la page web de la structure)
   ;{ Export HTML > All Arrays
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "Arrays.html")
@@ -296,6 +300,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   ;}
 
   ; Macros
+  ;- TODO : Macros > Ordre Alphabétique
   ;- TODO : Macros > Retour à la page d'accueil
   ;{ Export HTML > All Macros
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "Macros.html")
@@ -359,6 +364,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   ;}
 
   ; Enumerations
+  ;- TODO : Enumerations > Ordre Alphabétique
   ;- TODO : Enumerations > Retour à la page d'accueil
   ;{ Export HTML > All Enumerations
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "Enumerations.html")
@@ -418,6 +424,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   ; Structures
   ;- TODO : Structures > Retour à la page d'accueil
   ;- TODO : Structures > Pointer la structure de la LL vers la page web de la structure
+  ;- TODO : Structures > Ordre Alphabétique
   ;{ Export HTML > All Structures
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "Structures.html")
       HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
@@ -497,6 +504,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
 
   ; IncludeFiles
   ;- TODO : IncludeFiles > Retour à la page d'accueil
+  ;- TODO : IncludeFiles > Ordre Alphabétique
   ;{ Export HTML > All IncludeFiles
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "IncludeFiles.html")
       HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
@@ -536,97 +544,141 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
         HTML_AddHeader(lFileIDHTML, 1, \sFilename)
         ;{ Arrays
         HTML_AddHeader(lFileIDHTML, 2, "Arrays")
-          HTML_OpenList(lFileIDHTML)
+          HTML_OpenParagraph(lFileIDHTML)
             plNbItems =0
             ForEach LL_ListArrays()
               If LL_ListArrays()\ptrInclude = ListIndex(LL_IncludeFiles())
-                HTML_AddElement(lFileIDHTML, "<a href="+#DQuote + "../Arrays/"+StringField(LL_ListArrays()\sName, 1, ".")+".html"+#DQuote+">"+LL_ListArrays()\sName+"</a>")
+                HTML_AddText(lFileIDHTML, "<a href="+#DQuote + "../Arrays/"+StringField(LL_ListArrays()\sName, 1, ".")+".html"+#DQuote+">"+LL_ListArrays()\sName+"</a>")
+                HTML_AddNewLine(lFileIDHTML)
                 plNbItems + 1
               EndIf
             Next
             If plNbItems = 0
-              HTML_AddElement(lFileIDHTML, "None")
+              HTML_AddText(lFileIDHTML, "None")
+              HTML_AddNewLine(lFileIDHTML)
             EndIf
-          HTML_CloseList(lFileIDHTML)
+          HTML_CloseParagraph(lFileIDHTML)
         ;}
         ;{ Constants
         HTML_AddHeader(lFileIDHTML, 2, "Constants")
-          HTML_OpenList(lFileIDHTML)
+          HTML_OpenParagraph(lFileIDHTML)
             plNbItems =0
             ForEach LL_ListConstants()
               If LL_ListConstants()\ptrInclude = ListIndex(LL_IncludeFiles())
-                HTML_AddElement(lFileIDHTML, "<a href="+#DQuote + "../Constants/"+ReplaceString(LL_ListConstants()\sName, "#", "")+".html"+#DQuote+">"+LL_ListConstants()\sName+"</a>")
+                HTML_AddText(lFileIDHTML, "<a href="+#DQuote + "../Constants/"+ReplaceString(LL_ListConstants()\sName, "#", "")+".html"+#DQuote+">"+LL_ListConstants()\sName+"</a>")
+                HTML_AddNewLine(lFileIDHTML)
                 plNbItems + 1
               EndIf
             Next
             If plNbItems = 0
-              HTML_AddElement(lFileIDHTML, "None")
+              HTML_AddText(lFileIDHTML, "None")
+              HTML_AddNewLine(lFileIDHTML)
             EndIf
-          HTML_CloseList(lFileIDHTML)
+          HTML_CloseParagraph(lFileIDHTML)
         ;}
         ;{ LinkedLists
         HTML_AddHeader(lFileIDHTML, 2, "LinkedLists")
-          HTML_OpenList(lFileIDHTML)
+          HTML_OpenParagraph(lFileIDHTML)
             plNbItems =0
             ForEach LL_ListLinkedLists()
               If LL_ListLinkedLists()\ptrInclude = ListIndex(LL_IncludeFiles())
-                HTML_AddElement(lFileIDHTML, "<a href="+#DQuote + "../LinkedLists/"+StringField(LL_ListLinkedLists()\sName, 1, ".")+".html"+#DQuote+">"+LL_ListConstants()\sName+"</a>")
+                HTML_AddText(lFileIDHTML, "<a href="+#DQuote + "../LinkedLists/"+StringField(LL_ListLinkedLists()\sName, 1, ".")+".html"+#DQuote+">"+LL_ListLinkedLists()\sName+"</a>")
+                HTML_AddNewLine(lFileIDHTML)
                 plNbItems + 1
               EndIf
             Next
             If plNbItems = 0
-              HTML_AddElement(lFileIDHTML, "None")
+              HTML_AddText(lFileIDHTML, "None")
+              HTML_AddNewLine(lFileIDHTML)
             EndIf
-          HTML_CloseList(lFileIDHTML)
+          HTML_CloseParagraph(lFileIDHTML)
         ;}
         ;{ Macros
         HTML_AddHeader(lFileIDHTML, 2, "Macros")
-          HTML_OpenList(lFileIDHTML)
+          HTML_OpenParagraph(lFileIDHTML)
             plNbItems =0
             ForEach LL_ListMacros()
               If LL_ListMacros()\ptrInclude = ListIndex(LL_IncludeFiles())
-                HTML_AddElement(lFileIDHTML, "<a href="+#DQuote + "../Macros/"+LL_ListMacros()\sName+".html"+#DQuote+">"+LL_ListMacros()\sName+"</a>")
+                HTML_AddText(lFileIDHTML, "<a href="+#DQuote + "../Macros/"+LL_ListMacros()\sName+".html"+#DQuote+">"+LL_ListMacros()\sName+"</a>")
+                HTML_AddNewLine(lFileIDHTML)
                 plNbItems + 1
               EndIf
             Next
             If plNbItems = 0
-              HTML_AddElement(lFileIDHTML, "None")
+              HTML_AddText(lFileIDHTML, "None")
+              HTML_AddNewLine(lFileIDHTML)
             EndIf
-          HTML_CloseList(lFileIDHTML)
+          HTML_CloseParagraph(lFileIDHTML)
         ;}
         ;{ Procedures
         HTML_AddHeader(lFileIDHTML, 2, "Procedures")
-          HTML_OpenList(lFileIDHTML)
+          HTML_OpenParagraph(lFileIDHTML)
             plNbItems =0
             ForEach LL_ListProcedures()
               If LL_ListProcedures()\ptrInclude = ListIndex(LL_IncludeFiles())
-                HTML_AddElement(lFileIDHTML, "<a href="+#DQuote + "../Functions/"+LL_ListProcedures()\sName+".html"+#DQuote+">"+LL_ListProcedures()\sName+"()</a>")
+                HTML_AddText(lFileIDHTML, "<a href="+#DQuote + "../Functions/"+LL_ListProcedures()\sName+".html"+#DQuote+">"+LL_ListProcedures()\sName+"()</a>")
+                HTML_AddNewLine(lFileIDHTML)
                 plNbItems + 1
               EndIf
             Next
             If plNbItems = 0
-              HTML_AddElement(lFileIDHTML, "None")
+              HTML_AddText(lFileIDHTML, "None")
+              HTML_AddNewLine(lFileIDHTML)
             EndIf
           HTML_CloseList(lFileIDHTML)
         ;}
         ;{ Structures
         HTML_AddHeader(lFileIDHTML, 2, "Structures")
-          HTML_OpenList(lFileIDHTML)
+          HTML_OpenParagraph(lFileIDHTML)
             plNbItems =0
             ForEach LL_ListStructures()
               If LL_ListStructures()\ptrInclude = ListIndex(LL_IncludeFiles())
-                HTML_AddElement(lFileIDHTML, "<a href="+#DQuote + "../Structures/"+LL_ListStructures()\sName+".html"+#DQuote+">"+LL_ListStructures()\sName+"</a>")
+                HTML_AddText(lFileIDHTML, "<a href="+#DQuote + "../Structures/"+LL_ListStructures()\sName+".html"+#DQuote+">"+LL_ListStructures()\sName+"</a>")
+                HTML_AddNewLine(lFileIDHTML)
                 plNbItems + 1
               EndIf
             Next
             If plNbItems = 0
-              HTML_AddElement(lFileIDHTML, "None")
+              HTML_AddText(lFileIDHTML, "None")
+              HTML_AddNewLine(lFileIDHTML)
             EndIf
-          HTML_CloseList(lFileIDHTML)
+          HTML_CloseParagraph(lFileIDHTML)
         ;}
         HTML_CloseFile(lFileIDHTML)
         lFileIDHTML = 0
       EndWith
     Next
+  ;}
+
+  ; INDEX
+  ;{ Export HTML > Index
+    lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "Index.html")
+      HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
+      HTML_SetTitle(lFileIDHTML, "Project")
+      HTML_AddInternFile(lFileIDHTML, #HTML_Extern_CSS, psCSSforHTML)
+      HTML_AddHeader(lFileIDHTML, 1, "Project")
+      HTML_AddHeader(lFileIDHTML, 2, "Description")
+      HTML_OpenParagraph(lFileIDHTML)
+        HTML_AddText(lFileIDHTML, "Description of the project")
+      HTML_CloseParagraph(lFileIDHTML)
+      HTML_AddHeader(lFileIDHTML, 2, "Tables of Contents")
+      HTML_OpenParagraph(lFileIDHTML)
+        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "Arrays.html" + #DQuote + ">Arrays</a>")
+        HTML_AddNewLine(lFileIDHTML)
+        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "Constants.html" + #DQuote + ">Constants</a>")
+        HTML_AddNewLine(lFileIDHTML)
+        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "Enumerations.html" + #DQuote + ">Enumerations</a>")
+        HTML_AddNewLine(lFileIDHTML)
+        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "IncludeFiles.html" + #DQuote + ">Include Files</a>")
+        HTML_AddNewLine(lFileIDHTML)
+        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "LinkedLists.html" + #DQuote + ">LinkedLists</a>")
+        HTML_AddNewLine(lFileIDHTML)
+        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "Macros.html" + #DQuote + ">Macros</a>")
+        HTML_AddNewLine(lFileIDHTML)
+        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "Functions.html" + #DQuote + ">Procedures</a>")
+        HTML_AddNewLine(lFileIDHTML)
+        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "Structures.html" + #DQuote + ">Structures</a>")
+      HTML_CloseParagraph(lFileIDHTML)
+    HTML_CloseFile(lFileIDHTML)
   ;}
 EndProcedure
