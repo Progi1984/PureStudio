@@ -266,11 +266,16 @@ EndStructure
       EndIf
   EndProcedure
   
+  ;- Boxs
   ProcedureDLL HTML_OpenParagraph(ID.l, *Style.S_HTML_Style_Paragraph)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *RObject
         With *RObject
-          
+          \sContent + "<p"
+          If *Style <> #Null
+            \sContent + " style="+ #DQuote + HTML_ReturnCSSParagraph(*Style) + #DQuote
+          EndIf
+          \sContent = "/>"
         EndWith
         ProcedureReturn #True
       Else
@@ -292,7 +297,11 @@ EndStructure
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *RObject
         With *RObject
-          \sContent + "<div>"
+          \sContent + "<div"
+          If *Style <> #Null
+            \sContent + " style="+ #DQuote + HTML_ReturnCSSParagraph(*Style) + #DQuote
+          EndIf
+          \sContent = "/>"
         EndWith
         ProcedureReturn #True
       Else
