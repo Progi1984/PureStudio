@@ -157,7 +157,46 @@ EndStructure
     ; CloseFile
     If *RObject
       With *RObject
-        
+        Protected sHTMLContent.s
+        ; html
+        sHTMLContent + "<html>"
+        ; head
+          sHTMLContent + "<head>"
+          If \sTitle <> ""
+            sHTMLContent + "<title>"+ \sTitle + "</title>"
+          EndIf
+          If \sAuthor <> ""
+            sHTMLContent + "<meta name="+#DQuote+"author"+#DQuote+" content="+#DQuote+\sAuthor+#DQuote+"/>"
+          EndIf
+          If \sDescription <> ""
+            sHTMLContent + "<meta name="+#DQuote+"description"+#DQuote+" content="+#DQuote+\sDescription+#DQuote+"/>"
+          EndIf
+          If \sKeywords <> ""
+            sHTMLContent + "<meta name="+#DQuote+"keywords"+#DQuote+" content="+#DQuote+\sKeywords+#DQuote+"/>"
+          EndIf
+          If \sGenerator <> ""
+            sHTMLContent + "<meta name="+#DQuote+"generator"+#DQuote+" content="+#DQuote+\sGenerator+#DQuote+"/>"
+          EndIf
+          If \lExternJSFileNb > 0
+            For lInc = 0 To \lExternJSFileNb -1
+              sHTMLContent + "<script src="+#DQuote+\dimExternJSFile[lInc]+#DQuote+" type="+#DQuote+"text/javascript"+#DQuote+">"
+            Next
+          EndIf
+          If \lExternCSSFileNb > 0
+            For lInc = 0 To \lExternCSSFileNb -1
+              sHTMLContent + "<link href="+#DQuote+\dimExternJSFile[lInc]+#DQuote+" rel="+#DQuote+"stylesheet"+#DQuote+" type="+#DQuote+"text/css"+#DQuote+">"
+            Next
+          EndIf
+          ; sInternJSFile.s
+          ; sInternCSSFile.s
+          ; lEncoding.l
+        sHTMLContent + "</head>"
+        ; body
+          sHTMLContent + "<body>"
+          sHTMLContent + \sContent
+          sHTMLContent + "</body>"
+        ; html
+        sHTMLContent + "</html>"
       EndWith
     EndIf
     ; Releasing object
@@ -166,7 +205,7 @@ EndStructure
     EndIf
     ProcedureReturn #True
   EndProcedure
-
+  ;- Header
   ProcedureDLL HTML_SetAuthor(ID.l, Author.s)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *RObject
@@ -265,7 +304,6 @@ EndStructure
         ProcedureReturn #False
       EndIf
   EndProcedure
-  
   ;- Boxes
   ProcedureDLL HTML_OpenParagraph(ID.l, *Style.S_HTML_Style_Paragraph)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
@@ -408,23 +446,31 @@ EndStructure
         ProcedureReturn #False
       EndIf
   EndProcedure
-  ; Lists
-  ProcedureDLL HTML_OpenList(ID.l)
+  ;- Lists
+  ProcedureDLL HTML_OpenList(ID.l, bWithOrder)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *RObject
         With *RObject
-          
+          If bWithOrder = #True
+            \sContent + "<ol>"
+          Else
+            \sContent + "<ul>"
+          EndIf
         EndWith
         ProcedureReturn #True
       Else
         ProcedureReturn #False
       EndIf
   EndProcedure
-  ProcedureDLL HTML_CloseList(ID.l)
+  ProcedureDLL HTML_CloseList(ID.l, bWithOrder)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *RObject
         With *RObject
-          
+          If bWithOrder = #True
+            \sContent + "</ol>"
+          Else
+            \sContent + "</ul>"
+          EndIf
         EndWith
         ProcedureReturn #True
       Else
@@ -435,19 +481,19 @@ EndStructure
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *RObject
         With *RObject
-          
+          \sContent + "<li>" + Text + "</li>"
         EndWith
         ProcedureReturn #True
       Else
         ProcedureReturn #False
       EndIf
   EndProcedure
-  
+  ;- Misc
   ProcedureDLL HTML_AddImage(ID.l, Filename.s)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *RObject
         With *RObject
-          
+          \sContent + "<img src="+#DQuote+Filename+#DQuote+">"
         EndWith
         ProcedureReturn #True
       Else
@@ -458,7 +504,7 @@ EndStructure
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *RObject
         With *RObject
-          
+          \sContent + "</br>"
         EndWith
         ProcedureReturn #True
       Else
@@ -469,18 +515,11 @@ EndStructure
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *RObject
         With *RObject
-          
-        EndWith
-        ProcedureReturn #True
-      Else
-        ProcedureReturn #False
-      EndIf
-  EndProcedure
-  ProcedureDLL HTML_AddTextWiki(ID.l, Text.s)
-      Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
-          
+          If *Style <> #Null
+            \sContent + "<span style="+#DQuote + HTML_ReturnCSSFormat(*Style) + #DQuote+">"+Text+"</span>"
+          Else
+            \sContent + Text
+          EndIf
         EndWith
         ProcedureReturn #True
       Else
@@ -491,10 +530,11 @@ EndStructure
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *RObject
         With *RObject
-          
+          \sContent + "<h"+Str(HeaderLevel)+">"+Text+"</h"+Str(HeaderLevel)+">"
         EndWith
         ProcedureReturn #True
       Else
         ProcedureReturn #False
       EndIf
   EndProcedure
+  
