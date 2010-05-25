@@ -42,6 +42,9 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
           EndWith
         Next
       HTML_CloseParagraph(lFileIDHTML)
+      HTML_OpenParagraph(lFileIDHTML)
+        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "index.html" + #DQuote + ">Accueil</a>")
+      HTML_CloseParagraph(lFileIDHTML)
     HTML_CloseFile(lFileIDHTML)
   ;}
   ;{ Export HTML > Procedure
@@ -652,7 +655,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
 
   ; INDEX
   ;{ Export HTML > Index
-    lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "Index.html")
+    lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "index.html")
       HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
       HTML_SetTitle(lFileIDHTML, "Project")
       HTML_AddInternFile(lFileIDHTML, #HTML_Extern_CSS, psCSSforHTML)
