@@ -122,6 +122,22 @@ EndStructure
     EndIf
   EndProcedure
   ProcedureDLL.s HTML_ReturnCSSParagraph(*Format.S_HTML_Style_Paragraph)
+    Protected sCSS.s
+    If *Format <> #Null
+      If *Format\bMargin = #True
+        sCSS + "margin:"+*Format\S_Margin\sTop + " " +*Format\S_Margin\sRight + " "+*Format\S_Margin\sBottom+ " "+*Format\S_Margin\sLeft + ";"
+      EndIf
+      If *Format\bPadding = #True
+        sCSS + "padding:"+*Format\S_Padding\sTop + " " +*Format\S_Padding\sRight + " "+*Format\S_Padding\sBottom+ " "+*Format\S_Padding\sLeft + ";"
+      EndIf
+      If *Format\bBorder = #True
+        sCSS + "border-width:"+*Format\S_Border\sTop + " " +*Format\S_Border\sRight + " "+*Format\S_Border\sBottom+ " "+*Format\S_Border\sLeft + ";"
+        sCSS + "border-style:"+*Format\S_BorderStyle\sTop + " " +*Format\S_BorderStyle\sRight + " "+*Format\S_BorderStyle\sBottom+ " "+*Format\S_BorderStyle\sLeft + ";"
+        sCSS + "border-color:"+*Format\S_BorderColor\sTop + " " +*Format\S_BorderColor\sRight + " "+*Format\S_BorderColor\sBottom+ " "+*Format\S_BorderColor\sLeft + ";"        
+      EndIf
+    Else
+      ProcedureReturn ""
+    EndIf
   EndProcedure
   
   ProcedureDLL.l HTML_CreateFile(ID.l, Filename.s)
