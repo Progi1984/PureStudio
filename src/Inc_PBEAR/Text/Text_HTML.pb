@@ -266,7 +266,7 @@ EndStructure
       EndIf
   EndProcedure
   
-  ;- Boxs
+  ;- Boxes
   ProcedureDLL HTML_OpenParagraph(ID.l, *Style.S_HTML_Style_Paragraph)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *RObject
@@ -324,7 +324,7 @@ EndStructure
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *RObject
         With *RObject
-          
+          \sContent + "<table>
         EndWith
         ProcedureReturn #True
       Else
@@ -335,7 +335,7 @@ EndStructure
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *RObject
         With *RObject
-          
+          \sContent + "</table>
         EndWith
         ProcedureReturn #True
       Else
@@ -346,7 +346,7 @@ EndStructure
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *RObject
         With *RObject
-          
+          \sContent + "<th>
         EndWith
         ProcedureReturn #True
       Else
@@ -357,7 +357,7 @@ EndStructure
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *RObject
         With *RObject
-          
+          \sContent + "</th>
         EndWith
         ProcedureReturn #True
       Else
@@ -368,7 +368,7 @@ EndStructure
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *RObject
         With *RObject
-          
+          \sContent + "<tr>
         EndWith
         ProcedureReturn #True
       Else
@@ -379,7 +379,7 @@ EndStructure
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *RObject
         With *RObject
-          
+          \sContent + "</tr>
         EndWith
         ProcedureReturn #True
       Else
@@ -390,7 +390,7 @@ EndStructure
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *RObject
         With *RObject
-          
+          \sContent + "<td>
         EndWith
         ProcedureReturn #True
       Else
@@ -401,14 +401,14 @@ EndStructure
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *RObject
         With *RObject
-          
+          \sContent + "</td>
         EndWith
         ProcedureReturn #True
       Else
         ProcedureReturn #False
       EndIf
   EndProcedure
-  
+  ; Lists
   ProcedureDLL HTML_OpenList(ID.l)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *RObject
