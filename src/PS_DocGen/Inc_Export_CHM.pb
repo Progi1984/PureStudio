@@ -30,7 +30,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
  
   ; Procedures
   ;- TODO : Procedures > Source : ajouter le nom, les paramètres et le type
-  ;- TODO : Procedures > Ordre Alphabétique
+  SortStructuredList(LL_ListProcedures(), #PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeProcedure\sName), #PB_Sort_String)
   ;{ Export HTML > All Procedures
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "functions.html")
       HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
@@ -47,7 +47,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
         Next
       HTML_CloseParagraph(lFileIDHTML)
       HTML_OpenParagraph(lFileIDHTML, @pStyleCenter)
-        HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"../index.html"+#DQuote+">Index</a>")
+        HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"index.html"+#DQuote+">Index</a>")
       HTML_CloseParagraph(lFileIDHTML)
     HTML_CloseFile(lFileIDHTML)
   ;}
@@ -139,7 +139,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   ; Constantes
   ;- TODO : Constants > Vérifier l'existence des constantes dans la LL
   ;- TODO : Constants > Ne pas prendre les constantes en PB_
-  ;- TODO : Constants > Ordre Alphabétique
+  SortStructuredList(LL_ListConstants(),#PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeConstant\sName), #PB_Sort_String)
   ;{ Export HTML > All Constants
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "constants.html")
       HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
@@ -156,7 +156,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
         Next
       HTML_CloseParagraph(lFileIDHTML)
       HTML_OpenParagraph(lFileIDHTML, @pStyleCenter)
-        HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"../index.html"+#DQuote+">Index</a>")
+        HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"index.html"+#DQuote+">Index</a>")
       HTML_CloseParagraph(lFileIDHTML)
     HTML_CloseFile(lFileIDHTML)
   ;}
@@ -209,7 +209,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
 
   ; Listes Chainées
   ;- TODO : LinkedLists > Pointer la structure de la LL vers la page web de la structure
-  ;- TODO : LinkedLists > Ordre Alphabétique
+  SortStructuredList(LL_ListLinkedLists(),#PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeLinkedList\sName), #PB_Sort_String)
   ;{ Export HTML > All LinkedLists
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "linkedlists.html")
       HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
@@ -226,7 +226,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
         Next
       HTML_CloseParagraph(lFileIDHTML)
       HTML_OpenParagraph(lFileIDHTML, @pStyleCenter)
-        HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"../index.html"+#DQuote+">Index</a>")
+        HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"index.html"+#DQuote+">Index</a>")
       HTML_CloseParagraph(lFileIDHTML)
     HTML_CloseFile(lFileIDHTML)
   ;}
@@ -271,8 +271,8 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
 
   ; Tableaux
   ;- TODO : Arrays > Pointer la structure de la LL vers la page web de la structure
-  ;- TODO : Arrays > Ordre Alphabétique
   ;- TODO : Arrays > Taille du tableau (si constante, donne la valeur et pointe vers la page web de la structure)
+  SortStructuredList(LL_ListArrays(),#PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeArray\sName), #PB_Sort_String)
   ;{ Export HTML > All Arrays
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "arrays.html")
       HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
@@ -289,7 +289,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
         Next
       HTML_CloseParagraph(lFileIDHTML)
       HTML_OpenParagraph(lFileIDHTML, @pStyleCenter)
-        HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"../index.html"+#DQuote+">Index</a>")
+        HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"index.html"+#DQuote+">Index</a>")
       HTML_CloseParagraph(lFileIDHTML)
     HTML_CloseFile(lFileIDHTML)
   ;}
@@ -333,7 +333,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   ;}
 
   ; Macros
-  ;- TODO : Macros > Ordre Alphabétique
+  SortStructuredList(LL_ListMacros(),#PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeMacro\sName), #PB_Sort_String)
   ;{ Export HTML > All Macros
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "macros.html")
       HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
@@ -350,7 +350,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
         Next
       HTML_CloseParagraph(lFileIDHTML)
       HTML_OpenParagraph(lFileIDHTML, @pStyleCenter)
-        HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"../index.html"+#DQuote+">Index</a>")
+        HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"index.html"+#DQuote+">Index</a>")
       HTML_CloseParagraph(lFileIDHTML)
     HTML_CloseFile(lFileIDHTML)
   ;}
@@ -404,7 +404,6 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   ;}
 
   ; Enumerations
-  ;- TODO : Enumerations > Ordre Alphabétique
   ;{ Export HTML > All Enumerations
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "enumerations.html")
       HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
@@ -421,7 +420,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
         Next
       HTML_CloseParagraph(lFileIDHTML)
       HTML_OpenParagraph(lFileIDHTML, @pStyleCenter)
-        HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"../index.html"+#DQuote+">Index</a>")
+        HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"index.html"+#DQuote+">Index</a>")
       HTML_CloseParagraph(lFileIDHTML)
     HTML_CloseFile(lFileIDHTML)
   ;}
@@ -470,7 +469,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
 
   ; Structures
   ;- TODO : Structures > Pointer la structure de la LL vers la page web de la structure
-  ;- TODO : Structures > Ordre Alphabétique
+  SortStructuredList(LL_ListStructures(),#PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeStructure\sName), #PB_Sort_String)
   ;{ Export HTML > All Structures
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "structures.html")
       HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
@@ -487,7 +486,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
         Next
       HTML_CloseParagraph(lFileIDHTML)
       HTML_OpenParagraph(lFileIDHTML, @pStyleCenter)
-        HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"../index.html"+#DQuote+">Index</a>")
+        HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"index.html"+#DQuote+">Index</a>")
       HTML_CloseParagraph(lFileIDHTML)
     HTML_CloseFile(lFileIDHTML)
   ;}
@@ -557,7 +556,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   ;}
 
   ; IncludeFiles
-  ;- TODO : IncludeFiles > Ordre Alphabétique
+  SortStructuredList(LL_IncludeFiles(),#PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_FileInclude\sFilename), #PB_Sort_String)
   ;{ Export HTML > All IncludeFiles
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "includefiles.html")
       HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
@@ -578,7 +577,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
         Next
       HTML_CloseParagraph(lFileIDHTML)
       HTML_OpenParagraph(lFileIDHTML, @pStyleCenter)
-        HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"../index.html"+#DQuote+">Index</a>")
+        HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"index.html"+#DQuote+">Index</a>")
       HTML_CloseParagraph(lFileIDHTML)
     HTML_CloseFile(lFileIDHTML)
   ;}
@@ -724,21 +723,21 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
       HTML_CloseParagraph(lFileIDHTML)
       HTML_AddHeader(lFileIDHTML, 2, "Tables of Contents")
       HTML_OpenParagraph(lFileIDHTML)
-        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "Arrays.html" + #DQuote + ">Arrays</a>")
+        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "arrays.html" + #DQuote + ">Arrays</a>")
         HTML_AddNewLine(lFileIDHTML)
-        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "Constants.html" + #DQuote + ">Constants</a>")
+        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "constants.html" + #DQuote + ">Constants</a>")
         HTML_AddNewLine(lFileIDHTML)
-        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "Enumerations.html" + #DQuote + ">Enumerations</a>")
+        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "enumerations.html" + #DQuote + ">Enumerations</a>")
         HTML_AddNewLine(lFileIDHTML)
-        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "IncludeFiles.html" + #DQuote + ">Include Files</a>")
+        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "includefiles.html" + #DQuote + ">Include Files</a>")
         HTML_AddNewLine(lFileIDHTML)
-        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "LinkedLists.html" + #DQuote + ">LinkedLists</a>")
+        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "linkedlists.html" + #DQuote + ">LinkedLists</a>")
         HTML_AddNewLine(lFileIDHTML)
-        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "Macros.html" + #DQuote + ">Macros</a>")
+        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "macros.html" + #DQuote + ">Macros</a>")
         HTML_AddNewLine(lFileIDHTML)
-        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "Functions.html" + #DQuote + ">Procedures</a>")
+        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "functions.html" + #DQuote + ">Procedures</a>")
         HTML_AddNewLine(lFileIDHTML)
-        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "Structures.html" + #DQuote + ">Structures</a>")
+        HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "structures.html" + #DQuote + ">Structures</a>")
       HTML_CloseParagraph(lFileIDHTML)
     HTML_CloseFile(lFileIDHTML)
   ;}
