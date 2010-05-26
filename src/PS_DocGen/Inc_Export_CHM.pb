@@ -258,6 +258,14 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
             HTML_CloseParagraph(lFileIDHTML)
           EndIf
         ;}
+        ;{ Reference
+          If Len(StringField(\sName, 2, ".")) > 1
+            HTML_AddHeader(lFileIDHTML, 2, "Reference")
+            HTML_OpenParagraph(lFileIDHTML)
+              HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"../Structures/"+StringField(StringField(\sName, 2, "."),1,"(")+".html"+#DQuote+">"+StringField(\sName, 2, ".")+"</a>")
+            HTML_CloseParagraph(lFileIDHTML)
+          EndIf
+        ;}
         ;{ Home
           HTML_OpenParagraph(lFileIDHTML, @pStyleCenter)
             HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"../linkedlists.html"+#DQuote+">Linked Lists</a> - <a href="+#DQuote+"../index.html"+#DQuote+">Index</a>")
@@ -468,7 +476,6 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   ;}
 
   ; Structures
-  ;- TODO : Structures > Pointer la structure de la LL vers la page web de la structure
   SortStructuredList(LL_ListStructures(),#PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeStructure\sName), #PB_Sort_String)
   ;{ Export HTML > All Structures
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "structures.html")
