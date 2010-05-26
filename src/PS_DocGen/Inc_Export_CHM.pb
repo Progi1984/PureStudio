@@ -1,3 +1,17 @@
+ProcedureDLL DocGen_CHM_ConstantExists(psName.s)
+  Protected lIndex.l = ListIndex(LL_ListConstants())
+  Protected lReturn.l = #False
+  ForEach LL_ListConstants()
+    If ListIndex(LL_ListConstants()) < lIndex
+      If LL_ListConstants()\sName = psName
+        lReturn = #True
+        Break
+      EndIf
+    EndIf
+  Next
+  SelectElement(LL_ListConstants(), lIndex)
+  ProcedureReturn lReturn
+EndProcedure
 ProcedureDLL DocGen_ExportCHM(sPath.s)
   Protected lFileIDHTML.l, lIncA.l,plNbItems.l
   Protected psCSSforHTML.s, psContent.s
@@ -137,10 +151,9 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   ;}
   
   ; Constantes
-  ;- TODO : Constants > Vérifier l'existence des constantes dans la LL
-  ;- TODO : Constants > Ne pas prendre les constantes en PB_
-  SortStructuredList(LL_ListConstants(),#PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeConstant\sName), #PB_Sort_String)
+  ;- TODO : Get CompilerIf
   ;{ Export HTML > All Constants
+    SortStructuredList(LL_ListConstants(),#PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeConstant\sName), #PB_Sort_String)
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "constants.html")
       HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
       HTML_SetTitle(lFileIDHTML, "Constants")
@@ -150,8 +163,10 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
       HTML_OpenParagraph(lFileIDHTML)
         ForEach LL_ListConstants()
           With LL_ListConstants()
-            HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "Constants/"+ ReplaceString(\sName, "#", "") + ".html" + #DQuote + ">" + \sName + "</a>")
-            HTML_AddNewLine(lFileIDHTML)
+            If Left(ReplaceString(\sName, "#", ""),3) <> "PB_" And DocGen_CHM_ConstantExists(\sName) = #False
+              HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "Constants/"+ ReplaceString(\sName, "#", "") + ".html" + #DQuote + ">" + \sName + "</a>")
+              HTML_AddNewLine(lFileIDHTML)
+            EndIf
           EndWith
         Next
       HTML_CloseParagraph(lFileIDHTML)
@@ -164,53 +179,54 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
     CreateDirectory(sPath + "Constants")
     ForEach LL_ListConstants()
       With LL_ListConstants()
-        DocGen_ParserDoc(\sDescription, @LL_ListConstants()\ptrDoc)
-        lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "Constants"+ #System_Separator + ReplaceString(\sName, "#", "") + ".html")
-        ; head 
-        HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
-        HTML_SetTitle(lFileIDHTML, \sName)
-        HTML_AddInternFile(lFileIDHTML, #HTML_Extern_CSS, psCSSforHTML)
-        ; body
-        HTML_AddHeader(lFileIDHTML, 1, \sName)
-        ;{ Name
-          HTML_AddHeader(lFileIDHTML, 2, "Name")
-          HTML_OpenParagraph(lFileIDHTML)
-            HTML_OpenBlock(lFileIDHTML, @pFormatProcedureName)
-              HTML_AddText(lFileIDHTML, \sName)
-            HTML_CloseBlock(lFileIDHTML)
-          HTML_CloseParagraph(lFileIDHTML)
-        ;}
-        ;{ Value
-          HTML_AddHeader(lFileIDHTML, 2, "Value")
-          HTML_OpenParagraph(lFileIDHTML)
-            HTML_OpenBlock(lFileIDHTML)
-              HTML_AddText(lFileIDHTML, \sValue)
-            HTML_CloseBlock(lFileIDHTML)
-          HTML_CloseParagraph(lFileIDHTML)
-        ;}
-        ;{ Description
-          If \PtrDoc\sDescription > ""
-            HTML_AddHeader(lFileIDHTML, 2, "Description")
+        If Left(ReplaceString(\sName, "#", ""),3) <> "PB_" And DocGen_CHM_ConstantExists(\sName) = #False
+          DocGen_ParserDoc(\sDescription, @LL_ListConstants()\ptrDoc)
+          lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "Constants"+ #System_Separator + ReplaceString(\sName, "#", "") + ".html")
+          ; head 
+          HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
+          HTML_SetTitle(lFileIDHTML, \sName)
+          HTML_AddInternFile(lFileIDHTML, #HTML_Extern_CSS, psCSSforHTML)
+          ; body
+          HTML_AddHeader(lFileIDHTML, 1, \sName)
+          ;{ Name
+            HTML_AddHeader(lFileIDHTML, 2, "Name")
             HTML_OpenParagraph(lFileIDHTML)
-              HTML_AddText(lFileIDHTML, \PtrDoc\sDescription)
+              HTML_OpenBlock(lFileIDHTML, @pFormatProcedureName)
+                HTML_AddText(lFileIDHTML, \sName)
+              HTML_CloseBlock(lFileIDHTML)
             HTML_CloseParagraph(lFileIDHTML)
-          EndIf
-        ;}
-        ;{ Home
-          HTML_OpenParagraph(lFileIDHTML, @pStyleCenter)
-            HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"../constants.html"+#DQuote+">Constants</a> - <a href="+#DQuote+"../index.html"+#DQuote+">Index</a>")
-          HTML_CloseParagraph(lFileIDHTML)
-        ;}
-        HTML_CloseFile(lFileIDHTML)
-        lFileIDHTML = 0
+          ;}
+          ;{ Value
+            HTML_AddHeader(lFileIDHTML, 2, "Value")
+            HTML_OpenParagraph(lFileIDHTML)
+              HTML_OpenBlock(lFileIDHTML)
+                HTML_AddText(lFileIDHTML, \sValue)
+              HTML_CloseBlock(lFileIDHTML)
+            HTML_CloseParagraph(lFileIDHTML)
+          ;}
+          ;{ Description
+            If \PtrDoc\sDescription > ""
+              HTML_AddHeader(lFileIDHTML, 2, "Description")
+              HTML_OpenParagraph(lFileIDHTML)
+                HTML_AddText(lFileIDHTML, \PtrDoc\sDescription)
+              HTML_CloseParagraph(lFileIDHTML)
+            EndIf
+          ;}
+          ;{ Home
+            HTML_OpenParagraph(lFileIDHTML, @pStyleCenter)
+              HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"../constants.html"+#DQuote+">Constants</a> - <a href="+#DQuote+"../index.html"+#DQuote+">Index</a>")
+            HTML_CloseParagraph(lFileIDHTML)
+          ;}
+          HTML_CloseFile(lFileIDHTML)
+          lFileIDHTML = 0
+        EndIf
       EndWith
     Next
   ;}
 
   ; Listes Chainées
-  ;- TODO : LinkedLists > Pointer la structure de la LL vers la page web de la structure
-  SortStructuredList(LL_ListLinkedLists(),#PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeLinkedList\sName), #PB_Sort_String)
   ;{ Export HTML > All LinkedLists
+    SortStructuredList(LL_ListLinkedLists(),#PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeLinkedList\sName), #PB_Sort_String)
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "linkedlists.html")
       HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
       HTML_SetTitle(lFileIDHTML, "LinkedLists")
