@@ -59,6 +59,7 @@ Structure S_HTML_Side
   sRight.s
 EndStructure
 Structure S_HTML_Style_Paragraph
+  bAlignment.b
   ; Margin
   bMargin.b
   S_Margin.S_HTML_Side
@@ -72,7 +73,6 @@ Structure S_HTML_Style_Paragraph
   S_BorderStyle.S_HTML_Side
 EndStructure
 Structure S_HTML_Style_Format
-  bAlignment.b
   sFontColor.s
   sFontFamily.s
   sFontSize.s
@@ -105,14 +105,6 @@ EndStructure
       If *Format\bFontStyleOblique > 0
         sCSS + "font-style:oblique;"
       EndIf
-      If *Format\bAlignment > 0
-        Select *Format\bAlignment
-          Case #HTML_Alignment_Left : sCSS + "text-align:left;"
-          Case #HTML_Alignment_Right : sCSS + "text-align:right;"
-          Case #HTML_Alignment_Center : sCSS + "text-align:center;"
-          Case #HTML_Alignment_Justify : sCSS + "text-align:justify;"
-        EndSelect
-      EndIf
       If *Format\sBackgroundColor <> ""
         sCSS + "background-color:" + *Format\sBackgroundColor + ";"
       EndIf
@@ -124,17 +116,69 @@ EndStructure
   ProcedureDLL.s HTML_ReturnCSSParagraph(*Format.S_HTML_Style_Paragraph)
     Protected sCSS.s
     If *Format <> #Null
+      If *Format\bAlignment > 0
+        Select *Format\bAlignment
+          Case #HTML_Alignment_Left : sCSS + "text-align:left;"
+          Case #HTML_Alignment_Right : sCSS + "text-align:right;"
+          Case #HTML_Alignment_Center : sCSS + "text-align:center;"
+          Case #HTML_Alignment_Justify : sCSS + "text-align:justify;"
+        EndSelect
+      EndIf
       If *Format\bMargin = #True
-        sCSS + "margin:"+*Format\S_Margin\sTop + " " +*Format\S_Margin\sRight + " "+*Format\S_Margin\sBottom+ " "+*Format\S_Margin\sLeft + ";"
+        sCSS + "margin:"
+        If *Format\S_Margin\sTop <> "" : sCSS + *Format\S_Margin\sTop : Else : sCSS + "0px" : EndIf
+        sCSS + " " 
+        If *Format\S_Margin\sRight <> "" : sCSS + *Format\S_Margin\sRight : Else : sCSS + "0px" : EndIf
+        sCSS + " " 
+        If *Format\S_Margin\sBottom <> "" : sCSS + *Format\S_Margin\sBottom : Else : sCSS + "0px" : EndIf
+        sCSS + " " 
+        If *Format\S_Margin\sLeft <> "" : sCSS + *Format\S_Margin\sLeft : Else : sCSS + "0px" : EndIf
+        sCSS + ";" 
       EndIf
       If *Format\bPadding = #True
-        sCSS + "padding:"+*Format\S_Padding\sTop + " " +*Format\S_Padding\sRight + " "+*Format\S_Padding\sBottom+ " "+*Format\S_Padding\sLeft + ";"
+        sCSS + "padding:"
+        If *Format\S_Padding\sTop <> "" : sCSS + *Format\S_Padding\sTop : Else : sCSS + "0px" : EndIf
+        sCSS + " " 
+        If *Format\S_Padding\sRight <> "" : sCSS + *Format\S_Padding\sRight : Else : sCSS + "0px" : EndIf
+        sCSS + " " 
+        If *Format\S_Padding\sBottom <> "" : sCSS + *Format\S_Padding\sBottom : Else : sCSS + "0px" : EndIf
+        sCSS + " " 
+        If *Format\S_Padding\sLeft <> "" : sCSS + *Format\S_Padding\sLeft : Else : sCSS + "0px" : EndIf
+        sCSS + ";" 
       EndIf
       If *Format\bBorder = #True
-        sCSS + "border-width:"+*Format\S_Border\sTop + " " +*Format\S_Border\sRight + " "+*Format\S_Border\sBottom+ " "+*Format\S_Border\sLeft + ";"
-        sCSS + "border-style:"+*Format\S_BorderStyle\sTop + " " +*Format\S_BorderStyle\sRight + " "+*Format\S_BorderStyle\sBottom+ " "+*Format\S_BorderStyle\sLeft + ";"
-        sCSS + "border-color:"+*Format\S_BorderColor\sTop + " " +*Format\S_BorderColor\sRight + " "+*Format\S_BorderColor\sBottom+ " "+*Format\S_BorderColor\sLeft + ";"        
+        ; BORDER WIDTH
+        sCSS + "border-width:"
+        If *Format\S_Border\sTop <> "" : sCSS + *Format\S_Border\sTop : Else : sCSS + "0px" : EndIf
+        sCSS + " " 
+        If *Format\S_Border\sRight <> "" : sCSS + *Format\S_Border\sRight : Else : sCSS + "0px" : EndIf
+        sCSS + " " 
+        If *Format\S_Border\sBottom <> "" : sCSS + *Format\S_Border\sBottom : Else : sCSS + "0px" : EndIf
+        sCSS + " " 
+        If *Format\S_Border\sLeft <> "" : sCSS + *Format\S_Border\sLeft : Else : sCSS + "0px" : EndIf
+        sCSS + ";" 
+        ; BORDER STYLE
+        sCSS + "border-style:"
+        If *Format\S_BorderStyle\sTop <> "" : sCSS + *Format\S_BorderStyle\sTop : Else : sCSS + "solid" : EndIf
+        sCSS + " " 
+        If *Format\S_BorderStyle\sRight <> "" : sCSS + *Format\S_BorderStyle\sRight : Else : sCSS + "solid" : EndIf
+        sCSS + " " 
+        If *Format\S_BorderStyle\sBottom <> "" : sCSS + *Format\S_BorderStyle\sBottom : Else : sCSS + "solid" : EndIf
+        sCSS + " " 
+        If *Format\S_BorderStyle\sLeft <> "" : sCSS + *Format\S_BorderStyle\sLeft : Else : sCSS + "solid" : EndIf
+        sCSS + ";" 
+        ; BORDER COLOR
+        sCSS + "border-color:"
+        If *Format\S_BorderColor\sTop <> "" : sCSS + *Format\S_BorderColor\sTop : Else : sCSS + "	#000000" : EndIf
+        sCSS + " " 
+        If *Format\S_BorderColor\sRight <> "" : sCSS + *Format\S_BorderColor\sRight : Else : sCSS + "	#000000" : EndIf
+        sCSS + " " 
+        If *Format\S_BorderColor\sBottom <> "" : sCSS + *Format\S_BorderColor\sBottom : Else : sCSS + "	#000000" : EndIf
+        sCSS + " " 
+        If *Format\S_BorderColor\sLeft <> "" : sCSS + *Format\S_BorderColor\sLeft : Else : sCSS + "	#000000" : EndIf
+        sCSS + ";" 
       EndIf
+      ProcedureReturn sCSS
     Else
       ProcedureReturn ""
     EndIf
@@ -146,40 +190,41 @@ EndStructure
       Objects_TextHtml = TextHtml_INIT(@HTML_CloseFile())
     EndIf
     ; CreateFile
-    Protected *RObject.S_TextHtml = TextHtml_NEW(ID)
-     With *RObject
+    Protected *Object.S_TextHtml = TextHtml_NEW(ID)
+     With *Object
         \sFilename = Filename
      EndWith
-    ProcedureReturn *RObject
+    ProcedureReturn *Object
   EndProcedure
   ProcedureDLL.l HTML_CloseFile(ID.l)
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
     Protected sHTMLContent.s
-    Procedure lHTMLFile.l
-    If *RObject
-      With *RObject
+    Protected lHTMLFile.l
+    If *Object
+      With *Object
         ; html
-        sHTMLContent + "<html>" + #System_EOL
+        sHTMLContent + "<!DOCTYPE html PUBLIC "+Chr(34)+"-//W3C//DTD XHTML 1.1//EN"+Chr(34)+" "+Chr(34)+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"+Chr(34)+">" + #CRLF$
+        sHTMLContent + "<html>" + #CRLF$
         ; head
-        sHTMLContent + "<head>"+ #System_EOL
+        sHTMLContent + "<head>"+ #CRLF$
         If \sTitle <> ""
-          sHTMLContent + "<title>"+ \sTitle + "</title>"+ #System_EOL
+          sHTMLContent + "<title>"+ \sTitle + "</title>"+ #CRLF$
         EndIf
         If \sAuthor <> ""
-          sHTMLContent + "<meta name="+#DQuote+"author"+#DQuote+" content="+#DQuote+\sAuthor+#DQuote+"/>"+ #System_EOL
+          sHTMLContent + "<meta name="+Chr(34)+"author"+Chr(34)+" content="+Chr(34)+\sAuthor+Chr(34)+" />"+ #CRLF$
         EndIf
         If \sDescription <> ""
-          sHTMLContent + "<meta name="+#DQuote+"description"+#DQuote+" content="+#DQuote+\sDescription+#DQuote+"/>"+ #System_EOL
+          sHTMLContent + "<meta name="+Chr(34)+"description"+Chr(34)+" content="+Chr(34)+\sDescription+Chr(34)+" />"+ #CRLF$
         EndIf
         If \sKeywords <> ""
-          sHTMLContent + "<meta name="+#DQuote+"keywords"+#DQuote+" content="+#DQuote+\sKeywords+#DQuote+"/>"+ #System_EOL
+          sHTMLContent + "<meta name="+Chr(34)+"keywords"+Chr(34)+" content="+Chr(34)+\sKeywords+Chr(34)+" />"+ #CRLF$
         EndIf
         If \sGenerator <> ""
-          sHTMLContent + "<meta name="+#DQuote+"generator"+#DQuote+" content="+#DQuote+\sGenerator+#DQuote+"/>"+ #System_EOL
+          sHTMLContent + "<meta name="+Chr(34)+"generator"+Chr(34)+" content="+Chr(34)+\sGenerator+Chr(34)+" />"+ #CRLF$
         EndIf
         If \lEncoding > 0
           ; http://htmlhelp.com/tools/validator/supported-encodings.html.en
-          sHTMLContent + "<meta name="+#DQuote+"Content-Type"+#DQuote+" content="+#DQuote+"text/html; charset="+
+          sHTMLContent + "<meta name="+Chr(34)+"Content-Type"+Chr(34)+" content="+Chr(34)+"text/html; charset="
           Select \lEncoding
             Case #PB_UTF16 : sHTMLContent + "UTF-16"
             Case #PB_UTF16BE : sHTMLContent + "UTF-16BE"
@@ -189,29 +234,29 @@ EndStructure
             Case #PB_Ascii : sHTMLContent + "ISO-8859-1"
             Case #PB_Unicode : sHTMLContent + "UTF-8"
           EndSelect
-          sHTMLContent+#DQuote+"/>"+ #System_EOL
+          sHTMLContent+Chr(34)+" />"+ #CRLF$
         EndIf
         If \lExternJSFileNb > 0
           For lInc = 0 To \lExternJSFileNb -1
-            sHTMLContent + "<script src="+#DQuote+\dimExternJSFile[lInc]+#DQuote+" type="+#DQuote+"text/javascript"+#DQuote+">"+ #System_EOL
+            sHTMLContent + "<script src="+Chr(34)+\dimExternJSFile[lInc]+Chr(34)+" type="+Chr(34)+"text/javascript"+Chr(34)+">"+ #CRLF$
           Next
         EndIf
         If \lExternCSSFileNb > 0
           For lInc = 0 To \lExternCSSFileNb -1
-            sHTMLContent + "<link href="+#DQuote+\dimExternJSFile[lInc]+#DQuote+" rel="+#DQuote+"stylesheet"+#DQuote+" type="+#DQuote+"text/css"+#DQuote+">"+ #System_EOL
+            sHTMLContent + "<link href="+Chr(34)+\dimExternJSFile[lInc]+Chr(34)+" rel="+Chr(34)+"stylesheet"+Chr(34)+" type="+Chr(34)+"text/css"+Chr(34)+">"+ #CRLF$
           Next
         EndIf
         If \sInternJSFile <> ""
-          sHTMLContent + "<script language="+#DQuote+"javascript"+#DQuote+">"+\sInternJSFile+"</script>"+ #System_EOL
+          sHTMLContent + "<script language="+Chr(34)+"javascript"+Chr(34)+">"+#CRLF$+\sInternJSFile+"</script>"+ #CRLF$
         EndIf
         If \sInternCSSFile <> ""
-          sHTMLContent + "<style type="+#DQuote+"text/css"+#DQuote+">"+\sInternCSSFile+"</style>"+ #System_EOL
+          sHTMLContent + "<style type="+Chr(34)+"text/css"+Chr(34)+">"+#CRLF$+\sInternCSSFile+"</style>"+ #CRLF$
         EndIf
-        sHTMLContent + "</head>"+ #System_EOL
+        sHTMLContent + "</head>"+ #CRLF$
         ; body
-        sHTMLContent + "<body>"+ #System_EOL
-        sHTMLContent + \sContent+ #System_EOL
-        sHTMLContent + "</body>"+ #System_EOL
+        sHTMLContent + "<body>"+ #CRLF$
+        sHTMLContent + \sContent+ #CRLF$
+        sHTMLContent + "</body>"+ #CRLF$
         ; html
         sHTMLContent + "</html>"
         
@@ -224,7 +269,7 @@ EndStructure
       EndWith
     EndIf
     ; Releasing object
-    If *RObject
+    If *Object
       TextHtml_FREEID(ID)
     EndIf
     ProcedureReturn #True
@@ -232,8 +277,8 @@ EndStructure
   ;- Header
   ProcedureDLL HTML_SetAuthor(ID.l, Author.s)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
+      If *Object
+        With *Object
           \sAuthor = Author
         EndWith
         ProcedureReturn #True
@@ -243,8 +288,8 @@ EndStructure
   EndProcedure
   ProcedureDLL HTML_SetTitle(ID.l, Title.s)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
+      If *Object
+        With *Object
           \sTitle = Title
         EndWith
         ProcedureReturn #True
@@ -254,8 +299,8 @@ EndStructure
   EndProcedure
   ProcedureDLL HTML_SetDescription(ID.l, Description.s)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
+      If *Object
+        With *Object
           \sDescription = Description
         EndWith
         ProcedureReturn #True
@@ -265,8 +310,8 @@ EndStructure
   EndProcedure
   ProcedureDLL HTML_SetGenerator(ID.l, Generator.s)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
+      If *Object
+        With *Object
           \sGenerator = Generator
         EndWith
         ProcedureReturn #True
@@ -276,8 +321,8 @@ EndStructure
   EndProcedure
   ProcedureDLL HTML_SetKeywords(ID.l, Keywords.s)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
+      If *Object
+        With *Object
           \sKeywords = Keywords
         EndWith
         ProcedureReturn #True
@@ -287,8 +332,8 @@ EndStructure
   EndProcedure
   ProcedureDLL HTML_SetEncoding(ID.l, Encoding.l)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
+      If *Object
+        With *Object
           \lEncoding = lEncoding
         EndWith
         ProcedureReturn #True
@@ -298,8 +343,8 @@ EndStructure
   EndProcedure
   ProcedureDLL HTML_AddExternFile(ID.l, Type.l, Filename.s)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
+      If *Object
+        With *Object
           If Type = #HTML_Extern_Javascript
             \dimExternJSFile[\lExternJSFileNb] = Filename
             \lExternJSFileNb +1
@@ -315,8 +360,8 @@ EndStructure
   EndProcedure
   ProcedureDLL HTML_AddInternFile(ID.l, Type.l, Content.s)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
+      If *Object
+        With *Object
           If Type = #HTML_Extern_Javascript
             \sInternJSFile + Content
           ElseIf Type = #HTML_Extern_CSS
@@ -329,15 +374,15 @@ EndStructure
       EndIf
   EndProcedure
   ;- Boxes
-  ProcedureDLL HTML_OpenParagraph(ID.l, *Style.S_HTML_Style_Paragraph)
+  ProcedureDLL HTML_OpenParagraph(ID.l, *Style.S_HTML_Style_Paragraph = #Null)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
+      If *Object
+        With *Object
           \sContent + "<p"
           If *Style <> #Null
-            \sContent + " style="+ #DQuote + HTML_ReturnCSSParagraph(*Style) + #DQuote
+            \sContent + " style="+ Chr(34) + HTML_ReturnCSSParagraph(*Style) + Chr(34)
           EndIf
-          \sContent = "/>"
+          \sContent + ">"
         EndWith
         ProcedureReturn #True
       Else
@@ -346,8 +391,8 @@ EndStructure
   EndProcedure
   ProcedureDLL HTML_CloseParagraph(ID.l)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
+      If *Object
+        With *Object
           \sContent + "</p>"
         EndWith
         ProcedureReturn #True
@@ -355,15 +400,15 @@ EndStructure
         ProcedureReturn #False
       EndIf
   EndProcedure
-  ProcedureDLL HTML_OpenSection(ID.l, *Style.S_HTML_Style_Paragraph)
+  ProcedureDLL HTML_OpenSection(ID.l, *Style.S_HTML_Style_Paragraph = #Null)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
+      If *Object
+        With *Object
           \sContent + "<div"
           If *Style <> #Null
-            \sContent + " style="+ #DQuote + HTML_ReturnCSSParagraph(*Style) + #DQuote
+            \sContent + " style="+ Chr(34) + HTML_ReturnCSSParagraph(*Style) + Chr(34)
           EndIf
-          \sContent = "/>"
+          \sContent + ">"
         EndWith
         ProcedureReturn #True
       Else
@@ -372,9 +417,35 @@ EndStructure
   EndProcedure
   ProcedureDLL HTML_CloseSection(ID.l)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
+      If *Object
+        With *Object
           \sContent + "</div>"
+        EndWith
+        ProcedureReturn #True
+      Else
+        ProcedureReturn #False
+      EndIf
+  EndProcedure
+  ProcedureDLL HTML_OpenBlock(ID.l, *Style.S_HTML_Style_Paragraph = #Null)
+      Protected *Object.S_TextHtml= TextHtml_ID(ID)
+      If *Object
+        With *Object
+          \sContent + "<span"
+          If *Style <> #Null
+            \sContent + " style="+ Chr(34) + HTML_ReturnCSSParagraph(*Style) + Chr(34)
+          EndIf
+          \sContent + ">"
+        EndWith
+        ProcedureReturn #True
+      Else
+        ProcedureReturn #False
+      EndIf
+  EndProcedure
+  ProcedureDLL HTML_CloseBlock(ID.l)
+      Protected *Object.S_TextHtml= TextHtml_ID(ID)
+      If *Object
+        With *Object
+          \sContent + "</span>"
         EndWith
         ProcedureReturn #True
       Else
@@ -384,9 +455,9 @@ EndStructure
   ;- Tables
   ProcedureDLL HTML_OpenTable(ID.l)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
-          \sContent + "<table>
+      If *Object
+        With *Object
+          \sContent + "<table>"
         EndWith
         ProcedureReturn #True
       Else
@@ -395,9 +466,9 @@ EndStructure
   EndProcedure
   ProcedureDLL HTML_CloseTable(ID.l)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
-          \sContent + "</table>
+      If *Object
+        With *Object
+          \sContent + "</table>"
         EndWith
         ProcedureReturn #True
       Else
@@ -406,9 +477,9 @@ EndStructure
   EndProcedure
   ProcedureDLL HTML_OpenTableHeader(ID.l)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
-          \sContent + "<th>
+      If *Object
+        With *Object
+          \sContent + "<th>"
         EndWith
         ProcedureReturn #True
       Else
@@ -417,9 +488,9 @@ EndStructure
   EndProcedure
   ProcedureDLL HTML_CloseTableHeader(ID.l)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
-          \sContent + "</th>
+      If *Object
+        With *Object
+          \sContent + "</th>"
         EndWith
         ProcedureReturn #True
       Else
@@ -428,9 +499,9 @@ EndStructure
   EndProcedure
   ProcedureDLL HTML_OpenTableRow(ID.l)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
-          \sContent + "<tr>
+      If *Object
+        With *Object
+          \sContent + "<tr>"
         EndWith
         ProcedureReturn #True
       Else
@@ -439,9 +510,9 @@ EndStructure
   EndProcedure
   ProcedureDLL HTML_CloseTableRow(ID.l)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
-          \sContent + "</tr>
+      If *Object
+        With *Object
+          \sContent + "</tr>"
         EndWith
         ProcedureReturn #True
       Else
@@ -450,9 +521,9 @@ EndStructure
   EndProcedure
   ProcedureDLL HTML_OpenTableCell(ID.l)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
-          \sContent + "<td>
+      If *Object
+        With *Object
+          \sContent + "<td>"
         EndWith
         ProcedureReturn #True
       Else
@@ -461,9 +532,9 @@ EndStructure
   EndProcedure
   ProcedureDLL HTML_CloseTableCell(ID.l)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
-          \sContent + "</td>
+      If *Object
+        With *Object
+          \sContent + "</td>"
         EndWith
         ProcedureReturn #True
       Else
@@ -473,8 +544,8 @@ EndStructure
   ;- Lists
   ProcedureDLL HTML_OpenList(ID.l, bWithOrder)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
+      If *Object
+        With *Object
           If bWithOrder = #True
             \sContent + "<ol>"
           Else
@@ -488,8 +559,8 @@ EndStructure
   EndProcedure
   ProcedureDLL HTML_CloseList(ID.l, bWithOrder)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
+      If *Object
+        With *Object
           If bWithOrder = #True
             \sContent + "</ol>"
           Else
@@ -503,8 +574,8 @@ EndStructure
   EndProcedure
   ProcedureDLL HTML_AddListElement(ID.l, Text.s)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
+      If *Object
+        With *Object
           \sContent + "<li>" + Text + "</li>"
         EndWith
         ProcedureReturn #True
@@ -515,32 +586,32 @@ EndStructure
   ;- Misc
   ProcedureDLL HTML_AddImage(ID.l, Filename.s)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
-          \sContent + "<img src="+#DQuote+Filename+#DQuote+">"
+      If *Object
+        With *Object
+          \sContent + "<img src="+Chr(34)+Filename+Chr(34)+">"
         EndWith
         ProcedureReturn #True
       Else
         ProcedureReturn #False
       EndIf
   EndProcedure
-  ProcedureDLL HTML_AddNewLine()
+  ProcedureDLL HTML_AddNewLine(ID.l)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
-          \sContent + "</br>"
+      If *Object
+        With *Object
+          \sContent + "<br />"
         EndWith
         ProcedureReturn #True
       Else
         ProcedureReturn #False
       EndIf
   EndProcedure
-  ProcedureDLL HTML_AddText(ID.l, Text.s, *Style.S_HTML_Style_Format)
+  ProcedureDLL HTML_AddText(ID.l, Text.s, *Style.S_HTML_Style_Format = #Null)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
+      If *Object
+        With *Object
           If *Style <> #Null
-            \sContent + "<span style="+#DQuote + HTML_ReturnCSSFormat(*Style) + #DQuote+">"+Text+"</span>"
+            \sContent + "<span style="+Chr(34) + HTML_ReturnCSSFormat(*Style) + Chr(34)+">"+Text+"</span>"
           Else
             \sContent + Text
           EndIf
@@ -552,8 +623,10 @@ EndStructure
   EndProcedure
   ProcedureDLL HTML_AddHeader(ID.l, HeaderLevel.l, Text.s)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
-      If *RObject
-        With *RObject
+      If *Object
+        With *Object
+          If HeaderLevel < 1 : HeaderLevel = 1 : EndIf
+          If HeaderLevel > 1 : HeaderLevel = 6 : EndIf
           \sContent + "<h"+Str(HeaderLevel)+">"+Text+"</h"+Str(HeaderLevel)+">"
         EndWith
         ProcedureReturn #True
