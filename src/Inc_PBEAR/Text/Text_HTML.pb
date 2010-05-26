@@ -48,7 +48,7 @@ Enumeration 1 ; #HTML_Alignment
   #HTML_Alignment_Center
   #HTML_Alignment_Justify
 EndEnumeration
-Enumeration ; #HTML_Extern
+Enumeration 1 ; #HTML_Extern
   #HTML_Extern_Javascript
   #HTML_Extern_CSS
 EndEnumeration
@@ -154,49 +154,73 @@ EndStructure
   EndProcedure
   ProcedureDLL.l HTML_CloseFile(ID.l)
     Protected *Object.S_TextHtml= TextHtml_ID(ID)
-    ; CloseFile
+    Protected sHTMLContent.s
+    Procedure lHTMLFile.l
     If *RObject
       With *RObject
-        Protected sHTMLContent.s
         ; html
-        sHTMLContent + "<html>"
+        sHTMLContent + "<html>" + #System_EOL
         ; head
-          sHTMLContent + "<head>"
-          If \sTitle <> ""
-            sHTMLContent + "<title>"+ \sTitle + "</title>"
-          EndIf
-          If \sAuthor <> ""
-            sHTMLContent + "<meta name="+#DQuote+"author"+#DQuote+" content="+#DQuote+\sAuthor+#DQuote+"/>"
-          EndIf
-          If \sDescription <> ""
-            sHTMLContent + "<meta name="+#DQuote+"description"+#DQuote+" content="+#DQuote+\sDescription+#DQuote+"/>"
-          EndIf
-          If \sKeywords <> ""
-            sHTMLContent + "<meta name="+#DQuote+"keywords"+#DQuote+" content="+#DQuote+\sKeywords+#DQuote+"/>"
-          EndIf
-          If \sGenerator <> ""
-            sHTMLContent + "<meta name="+#DQuote+"generator"+#DQuote+" content="+#DQuote+\sGenerator+#DQuote+"/>"
-          EndIf
-          If \lExternJSFileNb > 0
-            For lInc = 0 To \lExternJSFileNb -1
-              sHTMLContent + "<script src="+#DQuote+\dimExternJSFile[lInc]+#DQuote+" type="+#DQuote+"text/javascript"+#DQuote+">"
-            Next
-          EndIf
-          If \lExternCSSFileNb > 0
-            For lInc = 0 To \lExternCSSFileNb -1
-              sHTMLContent + "<link href="+#DQuote+\dimExternJSFile[lInc]+#DQuote+" rel="+#DQuote+"stylesheet"+#DQuote+" type="+#DQuote+"text/css"+#DQuote+">"
-            Next
-          EndIf
-          ; sInternJSFile.s
-          ; sInternCSSFile.s
-          ; lEncoding.l
-        sHTMLContent + "</head>"
+        sHTMLContent + "<head>"+ #System_EOL
+        If \sTitle <> ""
+          sHTMLContent + "<title>"+ \sTitle + "</title>"+ #System_EOL
+        EndIf
+        If \sAuthor <> ""
+          sHTMLContent + "<meta name="+#DQuote+"author"+#DQuote+" content="+#DQuote+\sAuthor+#DQuote+"/>"+ #System_EOL
+        EndIf
+        If \sDescription <> ""
+          sHTMLContent + "<meta name="+#DQuote+"description"+#DQuote+" content="+#DQuote+\sDescription+#DQuote+"/>"+ #System_EOL
+        EndIf
+        If \sKeywords <> ""
+          sHTMLContent + "<meta name="+#DQuote+"keywords"+#DQuote+" content="+#DQuote+\sKeywords+#DQuote+"/>"+ #System_EOL
+        EndIf
+        If \sGenerator <> ""
+          sHTMLContent + "<meta name="+#DQuote+"generator"+#DQuote+" content="+#DQuote+\sGenerator+#DQuote+"/>"+ #System_EOL
+        EndIf
+        If \lEncoding > 0
+          ; http://htmlhelp.com/tools/validator/supported-encodings.html.en
+          sHTMLContent + "<meta name="+#DQuote+"Content-Type"+#DQuote+" content="+#DQuote+"text/html; charset="+
+          Select \lEncoding
+            Case #PB_UTF16 : sHTMLContent + "UTF-16"
+            Case #PB_UTF16BE : sHTMLContent + "UTF-16BE"
+            Case #PB_UTF32 : sHTMLContent + "UTF-16"
+            Case #PB_UTF32BE : sHTMLContent + "UTF-16BE"
+            Case #PB_UTF8 : sHTMLContent + "UTF-8"
+            Case #PB_Ascii : sHTMLContent + "ISO-8859-1"
+            Case #PB_Unicode : sHTMLContent + "UTF-8"
+          EndSelect
+          sHTMLContent+#DQuote+"/>"+ #System_EOL
+        EndIf
+        If \lExternJSFileNb > 0
+          For lInc = 0 To \lExternJSFileNb -1
+            sHTMLContent + "<script src="+#DQuote+\dimExternJSFile[lInc]+#DQuote+" type="+#DQuote+"text/javascript"+#DQuote+">"+ #System_EOL
+          Next
+        EndIf
+        If \lExternCSSFileNb > 0
+          For lInc = 0 To \lExternCSSFileNb -1
+            sHTMLContent + "<link href="+#DQuote+\dimExternJSFile[lInc]+#DQuote+" rel="+#DQuote+"stylesheet"+#DQuote+" type="+#DQuote+"text/css"+#DQuote+">"+ #System_EOL
+          Next
+        EndIf
+        If \sInternJSFile <> ""
+          sHTMLContent + "<script language="+#DQuote+"javascript"+#DQuote+">"+\sInternJSFile+"</script>"+ #System_EOL
+        EndIf
+        If \sInternCSSFile <> ""
+          sHTMLContent + "<style type="+#DQuote+"text/css"+#DQuote+">"+\sInternCSSFile+"</style>"+ #System_EOL
+        EndIf
+        sHTMLContent + "</head>"+ #System_EOL
         ; body
-          sHTMLContent + "<body>"
-          sHTMLContent + \sContent
-          sHTMLContent + "</body>"
+        sHTMLContent + "<body>"+ #System_EOL
+        sHTMLContent + \sContent+ #System_EOL
+        sHTMLContent + "</body>"+ #System_EOL
         ; html
         sHTMLContent + "</html>"
+        
+        ;Write HTML File
+        lHTMLFile = CreateFile(#PB_Any, \sFilename)
+        If lHTMLFile
+          WriteString(lHTMLFile, sHTMLContent)
+          CloseFile(lHTMLFile)
+        EndIf
       EndWith
     EndIf
     ; Releasing object
