@@ -259,10 +259,10 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
           EndIf
         ;}
         ;{ Reference
-          If Len(StringField(\sName, 2, ".")) > 1
+          If Len(StringField(StringField(\sName, 2, "."),1,"(")) > 1
             HTML_AddHeader(lFileIDHTML, 2, "Reference")
             HTML_OpenParagraph(lFileIDHTML)
-              HTML_AddText(lFileIDHTML, "<a href="+#DQuote+"../Structures/"+StringField(StringField(\sName, 2, "."),1,"(")+".html"+#DQuote+">"+StringField(\sName, 2, ".")+"</a>")
+              HTML_AddText(lFileIDHTML, "Structure : <a href="+#DQuote+"../Structures/"+StringField(StringField(\sName, 2, "."),1,"(")+".html"+#DQuote+">"+StringField(\sName, 2, ".")+"</a>")
             HTML_CloseParagraph(lFileIDHTML)
           EndIf
         ;}
@@ -278,10 +278,8 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   ;}
 
   ; Tableaux
-  ;- TODO : Arrays > Pointer la structure de la LL vers la page web de la structure
-  ;- TODO : Arrays > Taille du tableau (si constante, donne la valeur et pointe vers la page web de la structure)
-  SortStructuredList(LL_ListArrays(),#PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeArray\sName), #PB_Sort_String)
   ;{ Export HTML > All Arrays
+    SortStructuredList(LL_ListArrays(),#PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeArray\sName), #PB_Sort_String)
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "arrays.html")
       HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
       HTML_SetTitle(lFileIDHTML, "Arrays")
@@ -321,11 +319,40 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
             HTML_CloseBlock(lFileIDHTML)
           HTML_CloseParagraph(lFileIDHTML)
         ;}
+        ;{ Size
+            HTML_AddHeader(lFileIDHTML, 2, "Size")
+            HTML_OpenParagraph(lFileIDHTML)
+              If Left(StringField(StringField(\sName, 2, "("),1,")"),1) ="#"
+                ForEach LL_ListConstants()
+                  If LL_ListConstants()\sName = StringField(StringField(\sName, 2, "("),1,")")
+                    HTML_AddText(lFileIDHTML, LL_ListConstants()\sValue)
+                    Break
+                  EndIf
+                Next
+              Else
+                HTML_AddText(lFileIDHTML, StringField(StringField(\sName, 2, "("),1,")"))
+              EndIf
+            HTML_CloseParagraph(lFileIDHTML)
+        ;}
         ;{ Description
           If \PtrDoc\sDescription > ""
             HTML_AddHeader(lFileIDHTML, 2, "Description")
             HTML_OpenParagraph(lFileIDHTML)
               HTML_AddText(lFileIDHTML, \PtrDoc\sDescription)
+            HTML_CloseParagraph(lFileIDHTML)
+          EndIf
+        ;}
+        ;{ Reference
+          If Len(StringField(StringField(\sName, 2, "."),1,"(")) > 1 Or Left(StringField(StringField(\sName, 2, "("),1,")"),1) ="#"
+            HTML_AddHeader(lFileIDHTML, 2, "Reference")
+            HTML_OpenParagraph(lFileIDHTML)
+              If Len(StringField(StringField(\sName, 2, "."),1,"(")) > 1
+                HTML_AddText(lFileIDHTML, "Structure : <a href="+#DQuote+"../Structures/"+StringField(StringField(\sName, 2, "."),1,"(")+".html"+#DQuote+">"+StringField(\sName, 2, ".")+"</a>")
+                HTML_AddNewLine(lFileIDHTML)
+              EndIf
+              If Left(StringField(StringField(\sName, 2, "("),1,")"),1) = "#"
+                HTML_AddText(lFileIDHTML, "Constant : <a href="+#DQuote+"../Constants/"+RemoveString(StringField(StringField(\sName, 2, "("),1,")"), "#")+".html"+#DQuote+">"+StringField(StringField(\sName, 2, "("),1,")")+"</a>")
+              EndIf
             HTML_CloseParagraph(lFileIDHTML)
           EndIf
         ;}
@@ -341,8 +368,8 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   ;}
 
   ; Macros
-  SortStructuredList(LL_ListMacros(),#PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeMacro\sName), #PB_Sort_String)
   ;{ Export HTML > All Macros
+    SortStructuredList(LL_ListMacros(),#PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeMacro\sName), #PB_Sort_String)
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "macros.html")
       HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
       HTML_SetTitle(lFileIDHTML, "Macros")
@@ -475,9 +502,9 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
     Next
   ;}
 
-  ; Structures
-  SortStructuredList(LL_ListStructures(),#PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeStructure\sName), #PB_Sort_String)
+  ; Structures  
   ;{ Export HTML > All Structures
+    SortStructuredList(LL_ListStructures(),#PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeStructure\sName), #PB_Sort_String)
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "structures.html")
       HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
       HTML_SetTitle(lFileIDHTML, "Structures")
@@ -563,8 +590,8 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   ;}
 
   ; IncludeFiles
-  SortStructuredList(LL_IncludeFiles(),#PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_FileInclude\sFilename), #PB_Sort_String)
   ;{ Export HTML > All IncludeFiles
+    SortStructuredList(LL_IncludeFiles(),#PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_FileInclude\sFilename), #PB_Sort_String)
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "includefiles.html")
       HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
       HTML_SetTitle(lFileIDHTML, "IncludeFiles")
