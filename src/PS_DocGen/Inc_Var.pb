@@ -1,5 +1,7 @@
 ;- Structures
 Structure S_Documentation
+  sFilename.s
+  sName.s
   sAuthor.s
   sDescription.s
   sReturn.s
@@ -9,6 +11,7 @@ EndStructure
 Structure S_TypeExport
   lType.l
   sPathExport.s
+  sFileExport.s
 EndStructure
 Structure S_FileInclude
   sPath.s
@@ -139,7 +142,7 @@ Global NewList LL_ListConstants.S_TypeConstant()
 Global NewList LL_ListProcedures.S_TypeProcedure()
 
 ;-Globals
-Global gsMainFile.s
+Global gsProject.S_Documentation
 
 ;-Macros
 Macro MR_Error(sError)

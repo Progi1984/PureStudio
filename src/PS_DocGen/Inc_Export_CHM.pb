@@ -1,4 +1,4 @@
-ProcedureDLL.l DocGen_CHM_ConstantExists(psName.s)
+Procedure.l DocGen_CHM_ConstantExists(psName.s)
   Protected plIndex.l = ListIndex(LL_ListConstants())
   Protected plReturn.l = #False
   Protected pbNumber.b = 0
@@ -15,7 +15,7 @@ ProcedureDLL.l DocGen_CHM_ConstantExists(psName.s)
   SelectElement(LL_ListConstants(), plIndex)
   ProcedureReturn plReturn
 EndProcedure
-ProcedureDLL.s DocGen_CHM_GetFilenameOfInclude(ptrInclude.l, bJustname.b = #False)
+Procedure.s DocGen_CHM_GetFilenameOfInclude(ptrInclude.l, bJustname.b = #False)
   SelectElement(LL_IncludeFiles(), ptrInclude)
   With LL_IncludeFiles()
     If bJustname = #True
@@ -29,8 +29,8 @@ ProcedureDLL.s DocGen_CHM_GetFilenameOfInclude(ptrInclude.l, bJustname.b = #Fals
     EndIf
   EndWith
 EndProcedure
-ProcedureDLL DocGen_ExportCHM(sPath.s)
-  Protected lFileIDHTML.l, lIncA.l,plNbItems.l
+Procedure.l DocGen_CHM_GenerateHTML(sPath.s)
+  Protected lFileIDHTML.l, lIncA.l, plNbItems.l
   Protected psCSSforHTML.s, psContent.s
   Protected pFormatBody.S_HTML_Style_Format
   Protected pFormatP.S_HTML_Style_Format
@@ -852,4 +852,67 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
       HTML_CloseParagraph(lFileIDHTML)
     HTML_CloseFile(lFileIDHTML)
   ;}
+EndProcedure
+Procedure.l DocGen_CHM_GenerateHHP(sPath.s, sFile.s)
+  Protected plFile.l, plDirectory.l, plSubDirectory.l
+  Protected NewList pListFilesHTML.s()
+  ; Clean old File
+  If FileSize(sPath +StringField(sFile, 1, ".")+".hhp") >= 0
+    DeleteFile(sPath +StringField(sFile, 1, ".")+".hhp")
+  EndIf
+  ; Write Header of HHP
+  CreatePreferences(sPath+StringField(sFile, 1, ".")+".hhp")
+    PreferenceComment("PureStudio (c) RootsLabs")
+    PreferenceGroup("OPTIONS")
+    WritePreferenceString("Compatibility","1.1 Or later")
+    WritePreferenceString("Compiled file",sFile)
+    WritePreferenceString("Contents file",StringField(sFile, 1, ".")+".hhp")
+    WritePreferenceString("Title",gsProject\sName)
+    WritePreferenceString("Default topic","HTML\index.html")
+    WritePreferenceString("Default Window","MAIN")
+    WritePreferenceString("Display compile progress","No")
+    WritePreferenceString("Full-text search","Yes")
+    WritePreferenceString("Language","0x40c")
+  ClosePreferences()
+  ; Examine directory for HTML Files
+  plDirectory = ExamineDirectory(#PB_Any, sPath +"HTML"+ #System_Separator, "*.*")
+  If plDirectory
+    While NextDirectoryEntry(plDirectory)
+      If DirectoryEntryType(plDirectory) = #PB_DirectoryEntry_File
+        AddElement(pListFilesHTML())
+        pListFilesHTML() = DirectoryEntryName(plDirectory)
+      Else
+        If DirectoryEntryName(plDirectory) <> "." And DirectoryEntryName(plDirectory) <> ".."
+          plSubDirectory = ExamineDirectory(#PB_Any, sPath +"HTML"+ #System_Separator + DirectoryEntryName(plDirectory), "*.html")
+          If plSubDirectory
+            While NextDirectoryEntry(plSubDirectory)
+              If DirectoryEntryType(plSubDirectory) = #PB_DirectoryEntry_File
+                AddElement(pListFilesHTML())
+                pListFilesHTML() = DirectoryEntryName(plDirectory) + "\" + DirectoryEntryName(plSubDirectory)
+              EndIf
+            Wend
+            FinishDirectory(plSubDirectory)
+          EndIf
+        EndIf
+      EndIf
+    Wend
+    FinishDirectory(plDirectory)
+  EndIf
+  SortList(pListFilesHTML(), #PB_Sort_Ascending|#PB_Sort_NoCase)
+  ; Write Body of HHP
+  If ListSize(pListFilesHTML()) > 0
+    plFile = OpenFile(#PB_Any, sPath+StringField(sFile, 1, ".")+".hhp")
+    FileSeek(plFile, Lof(plFile))
+    WriteStringN(plFile, "[FILES]")
+    ForEach pListFilesHTML()  
+      WriteStringN(plFile, pListFilesHTML())
+    Next
+    CloseFile(plFile)
+  EndIf
+EndProcedure
+ProcedureDLL DocGen_ExportCHM(sPath.s, sFile.s)
+  If CreateDirectory(sPath + "HTML" + #System_Separator)
+    DocGen_CHM_GenerateHTML(sPath + "HTML" + #System_Separator)
+  EndIf
+  DocGen_CHM_GenerateHHP(sPath, sFile)
 EndProcedure
