@@ -1,4 +1,5 @@
 IncludePath "Inc"
+  XIncludeFile "Misc.pb"
   XIncludeFile "StringBuilder.pb"
 IncludePath "Inc_PBEAR"
   XIncludeFile "PBEAR.pb"

@@ -127,6 +127,8 @@ Enumeration ; Regex
 EndEnumeration
 
 #DQuote = Chr(34)
+#DTab = Chr(9)
+#DSpace = Chr(32)
 
 #sApplication_Name = "DocGen"
 

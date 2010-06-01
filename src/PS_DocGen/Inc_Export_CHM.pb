@@ -1,3 +1,32 @@
+Macro DocGen_CHM_ExamineHTMLFiles()
+  ; Examine directory for HTML Files
+  Protected plDirectory.l, plSubDirectory.l
+  Protected NewList pListFilesHTML.s()
+  plDirectory = ExamineDirectory(#PB_Any, sPath +"HTML"+ #System_Separator, "*.*")
+  If plDirectory
+    While NextDirectoryEntry(plDirectory)
+      If DirectoryEntryType(plDirectory) = #PB_DirectoryEntry_File
+        AddElement(pListFilesHTML())
+        pListFilesHTML() = DirectoryEntryName(plDirectory)
+      Else
+        If DirectoryEntryName(plDirectory) <> "." And DirectoryEntryName(plDirectory) <> ".."
+          plSubDirectory = ExamineDirectory(#PB_Any, sPath +"HTML"+ #System_Separator + DirectoryEntryName(plDirectory), "*.html")
+          If plSubDirectory
+            While NextDirectoryEntry(plSubDirectory)
+              If DirectoryEntryType(plSubDirectory) = #PB_DirectoryEntry_File
+                AddElement(pListFilesHTML())
+                pListFilesHTML() = DirectoryEntryName(plDirectory) + "\" + DirectoryEntryName(plSubDirectory)
+              EndIf
+            Wend
+            FinishDirectory(plSubDirectory)
+          EndIf
+        EndIf
+      EndIf
+    Wend
+    FinishDirectory(plDirectory)
+  EndIf
+  SortList(pListFilesHTML(), #PB_Sort_Ascending|#PB_Sort_NoCase)
+EndMacro 
 Procedure.l DocGen_CHM_ConstantExists(psName.s)
   Protected plIndex.l = ListIndex(LL_ListConstants())
   Protected plReturn.l = #False
@@ -854,8 +883,8 @@ Procedure.l DocGen_CHM_GenerateHTML(sPath.s)
   ;}
 EndProcedure
 Procedure.l DocGen_CHM_GenerateHHP(sPath.s, sFile.s)
-  Protected plFile.l, plDirectory.l, plSubDirectory.l
-  Protected NewList pListFilesHTML.s()
+  Protected plFile.l
+  DocGen_CHM_ExamineHTMLFiles()
   ; Clean old File
   If FileSize(sPath +StringField(sFile, 1, ".")+".hhp") >= 0
     DeleteFile(sPath +StringField(sFile, 1, ".")+".hhp")
@@ -874,31 +903,7 @@ Procedure.l DocGen_CHM_GenerateHHP(sPath.s, sFile.s)
     WritePreferenceString("Full-text search","Yes")
     WritePreferenceString("Language","0x40c")
   ClosePreferences()
-  ; Examine directory for HTML Files
-  plDirectory = ExamineDirectory(#PB_Any, sPath +"HTML"+ #System_Separator, "*.*")
-  If plDirectory
-    While NextDirectoryEntry(plDirectory)
-      If DirectoryEntryType(plDirectory) = #PB_DirectoryEntry_File
-        AddElement(pListFilesHTML())
-        pListFilesHTML() = DirectoryEntryName(plDirectory)
-      Else
-        If DirectoryEntryName(plDirectory) <> "." And DirectoryEntryName(plDirectory) <> ".."
-          plSubDirectory = ExamineDirectory(#PB_Any, sPath +"HTML"+ #System_Separator + DirectoryEntryName(plDirectory), "*.html")
-          If plSubDirectory
-            While NextDirectoryEntry(plSubDirectory)
-              If DirectoryEntryType(plSubDirectory) = #PB_DirectoryEntry_File
-                AddElement(pListFilesHTML())
-                pListFilesHTML() = DirectoryEntryName(plDirectory) + "\" + DirectoryEntryName(plSubDirectory)
-              EndIf
-            Wend
-            FinishDirectory(plSubDirectory)
-          EndIf
-        EndIf
-      EndIf
-    Wend
-    FinishDirectory(plDirectory)
-  EndIf
-  SortList(pListFilesHTML(), #PB_Sort_Ascending|#PB_Sort_NoCase)
+
   ; Write Body of HHP
   If ListSize(pListFilesHTML()) > 0
     plFile = OpenFile(#PB_Any, sPath+StringField(sFile, 1, ".")+".hhp")
@@ -910,9 +915,86 @@ Procedure.l DocGen_CHM_GenerateHHP(sPath.s, sFile.s)
     CloseFile(plFile)
   EndIf
 EndProcedure
+Procedure.l DocGen_CHM_GenerateHHC(sPath.s, sFile.s)
+  Protected plFile.l
+  Protected pbInCategory.b, pbActionDone.b
+  Protected psPreviousFile.s, psTitle.s
+  DocGen_CHM_ExamineHTMLFiles()
+  If FileSize(sPath +StringField(sFile, 1, ".")+".hhc") >= 0
+  DeleteFile(sPath +StringField(sFile, 1, ".")+".hhc")
+  EndIf
+  plFile = CreateFile(#PB_Any, sPath +StringField(sFile, 1, ".")+".hhc")
+    WriteStringN(plFile, "<!DOCTYPE HTML PUBLIC "+#DQuote+"-//IETF//DTD HTML//EN"+#DQuote+">")
+    WriteStringN(plFile, "<html>")
+    WriteStringN(plFile, #DSpace + "<head>")
+    WriteStringN(plFile, #DSpace + #DSpace + "<meta name="+#DQuote+"generator"+#DQuote+" content="+#DQuote+"PureStudio (c) RootsLabs"+#DQuote+">")
+    WriteStringN(plFile, #DSpace + #DSpace + "<!-- Sitemap 1.0 -->")
+    WriteStringN(plFile, #DSpace + "</head>")
+    WriteStringN(plFile, #DSpace + "<body>")
+    WriteStringN(plFile, #DSpace + #DSpace + "<object type="+#DQuote+"text/site properties"+#DQuote+">")
+    WriteStringN(plFile, #DSpace + #DSpace + #DSpace + "<param name="+#DQuote+"Window Styles"+#DQuote+" value="+#DQuote+"0x800025"+#DQuote+">")
+    WriteStringN(plFile, #DSpace + #DSpace + "</object>")
+    WriteStringN(plFile, #DSpace + #DSpace + "<ul>")
+    WriteStringN(plFile, #DSpace + #DSpace + #DSpace + "<li>")
+    WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + "<object type="+#DQuote+"text/sitemap"+#DQuote+">")
+    WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + "<param name="+#DQuote+"Name"+#DQuote+" value="+#DQuote+"Home"+#DQuote+">")
+    WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + "<param name="+#DQuote+"Local"+#DQuote+" value="+#DQuote+"HTML\index.html"+#DQuote+">")
+    WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + "</object>")
+    WriteStringN(plFile, #DSpace + #DSpace + #DSpace + "</li>")
+    ForEach pListFilesHTML()
+      If pListFilesHTML() <> "index.html"
+        ; Clean the name of the page
+        psTitle = RemoveString(psPreviousFile, ".html")
+        If CountString(psTitle, "\") = 1
+          psTitle = StringField(psTitle, 2, "\")
+        EndIf
+        psTitle = UCase(Left(psTitle,1)) + Right(psTitle, Len(psTitle) - 1)
+        If  IsNumeric(StringField(psTitle, CountString(psTitle, "_") + 1, "_")) = #True
+          psTitle = Left(psTitle, Len(psTitle) - Len(StringField(psTitle, CountString(psTitle, "_") + 1, "_")) - 1)
+        EndIf
+        ; Write HTML
+        If CountString(pListFilesHTML(), "\") > 0 And pbInCategory = #False ; We Enter in a category
+            WriteStringN(plFile, #DSpace + #DSpace + #DSpace + "<li>")
+            WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + "<object type="+#DQuote+"text/sitemap"+#DQuote+">")
+            WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + "<param name="+#DQuote+"Name"+#DQuote+" value="+#DQuote+psTitle+#DQuote+">")
+            WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + "<param name="+#DQuote+"Local"+#DQuote+" value="+#DQuote+"HTML\"+psPreviousFile+#DQuote+">")
+            WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + "</object>")
+            WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + "<ul>")
+            pbInCategory = #True
+        ElseIf CountString(pListFilesHTML(), "\") = 0  And pbInCategory = #True ; We Go out of a category
+            WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + "<li>")
+            WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + "<object type="+#DQuote+"text/sitemap"+#DQuote+">")
+            WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + "<param name="+#DQuote+"Name"+#DQuote+" value="+#DQuote+psTitle+#DQuote+">")
+            WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + "<param name="+#DQuote+"Local"+#DQuote+" value="+#DQuote+"HTML\"+psPreviousFile+#DQuote+">")
+            WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + "</object>")
+            WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + "</li>")
+            WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + "</ul>")
+            WriteStringN(plFile, #DSpace + #DSpace + #DSpace + "</li>")
+            pbInCategory = #False
+        ElseIf psPreviousFile <> ""
+          WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + "<li>")
+          WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + "<object type="+#DQuote+"text/sitemap"+#DQuote+">")
+          WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + "<param name="+#DQuote+"Name"+#DQuote+" value="+#DQuote+psTitle+#DQuote+">")
+          WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + "<param name="+#DQuote+"Local"+#DQuote+" value="+#DQuote+"HTML\"+psPreviousFile+#DQuote+">")
+          WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + "</object>")
+          WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + #DSpace + "</li>")
+        EndIf
+        psPreviousFile = pListFilesHTML()
+      EndIf
+    Next
+    If pbInCategory = #True
+      WriteStringN(plFile, #DSpace + #DSpace + #DSpace + #DSpace + "</ul>")
+      WriteStringN(plFile, #DSpace + #DSpace + #DSpace + "</li>")
+    EndIf
+    WriteStringN(plFile, #DSpace + #DSpace + "</ul>")
+    WriteStringN(plFile, #DSpace + "</body>")
+    WriteStringN(plFile, "</html>")
+  CloseFile(plFile)
+EndProcedure
 ProcedureDLL DocGen_ExportCHM(sPath.s, sFile.s)
   If CreateDirectory(sPath + "HTML" + #System_Separator)
     DocGen_CHM_GenerateHTML(sPath + "HTML" + #System_Separator)
   EndIf
   DocGen_CHM_GenerateHHP(sPath, sFile)
+  DocGen_CHM_GenerateHHC(sPath, sFile)
 EndProcedure
