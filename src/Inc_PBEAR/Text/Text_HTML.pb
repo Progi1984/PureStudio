@@ -374,13 +374,20 @@ EndStructure
       EndIf
   EndProcedure
   ;- Boxes
-  ProcedureDLL HTML_OpenParagraph(ID.l, *Style.S_HTML_Style_Paragraph = #Null)
+  ProcedureDLL HTML_OpenParagraph(ID.l, *Style.S_HTML_Style_Paragraph = #Null, *Format.S_HTML_Style_Format = #Null)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *Object
         With *Object
           \sContent + "<p"
-          If *Style <> #Null
-            \sContent + " style="+ Chr(34) + HTML_ReturnCSSParagraph(*Style) + Chr(34)
+          If *Style <> #Null Or *Format <> #Null
+            \sContent + " style="+ Chr(34)
+            If *Style <> #Null 
+              \sContent + HTML_ReturnCSSParagraph(*Style)
+            EndIf
+            If *Format <> #Null 
+              \sContent + HTML_ReturnCSSFormat(*Format)
+            EndIf
+            \sContent + Chr(34)
           EndIf
           \sContent + ">"
         EndWith
@@ -400,13 +407,20 @@ EndStructure
         ProcedureReturn #False
       EndIf
   EndProcedure
-  ProcedureDLL HTML_OpenSection(ID.l, *Style.S_HTML_Style_Paragraph = #Null)
+  ProcedureDLL HTML_OpenSection(ID.l, *Style.S_HTML_Style_Paragraph = #Null, *Format.S_HTML_Style_Format = #Null)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *Object
         With *Object
           \sContent + "<div"
-          If *Style <> #Null
-            \sContent + " style="+ Chr(34) + HTML_ReturnCSSParagraph(*Style) + Chr(34)
+          If *Style <> #Null Or *Format <> #Null
+            \sContent + " style="+ Chr(34)
+            If *Style <> #Null 
+              \sContent + HTML_ReturnCSSParagraph(*Style)
+            EndIf
+            If *Format <> #Null 
+              \sContent + HTML_ReturnCSSFormat(*Format)
+            EndIf
+            \sContent + Chr(34)
           EndIf
           \sContent + ">"
         EndWith
@@ -426,13 +440,20 @@ EndStructure
         ProcedureReturn #False
       EndIf
   EndProcedure
-  ProcedureDLL HTML_OpenBlock(ID.l, *Style.S_HTML_Style_Paragraph = #Null)
+  ProcedureDLL HTML_OpenBlock(ID.l, *Style.S_HTML_Style_Paragraph = #Null, *Format.S_HTML_Style_Format = #Null)
       Protected *Object.S_TextHtml= TextHtml_ID(ID)
       If *Object
         With *Object
           \sContent + "<span"
-          If *Style <> #Null
-            \sContent + " style="+ Chr(34) + HTML_ReturnCSSParagraph(*Style) + Chr(34)
+          If *Style <> #Null Or *Format <> #Null
+            \sContent + " style="+ Chr(34)
+            If *Style <> #Null 
+              \sContent + HTML_ReturnCSSParagraph(*Style)
+            EndIf
+            If *Format <> #Null 
+              \sContent + HTML_ReturnCSSFormat(*Format)
+            EndIf
+            \sContent + Chr(34)
           EndIf
           \sContent + ">"
         EndWith
