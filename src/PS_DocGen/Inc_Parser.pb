@@ -1,5 +1,5 @@
 ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
-  Protected plFile.l, plNbResults.l, plNbResultsBis.l, plInc.l, plIncBis.l
+  Protected plFile.l, plNbResults.l, plNbResultsBis.l, plInc.l, plIncBis.l, plCurLine.l
   Protected psPathCur.s
   Protected psLine.s, psContent.s, psVar.s, psDoc.s
   Protected pbInMultiline.b, pbInStructure.b, pbInEnumeration.b, pbInMacro.b, pbInProcedure.b
@@ -15,6 +15,7 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
   If plFile
     While Eof(plFile) = 0
       psLine = Trim(ReadString(plFile))
+      plCurLine + 1
       If psLine > ""
         pbFound = #False
         If pbInMultiline = #False
@@ -164,6 +165,7 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
                 AddElement(LL_ListConstants())
                 With LL_ListConstants()
                   \ptrInclude = ptrInclude
+                  \ptrLine = plCurLine
                   \sName = ResRegex(0)
                   plNbResults = ExtractRegularExpression(#Regex_ConstantValue, psContent, ResRegex())
                   If plNbResults = 1
@@ -180,6 +182,7 @@ ProcedureDLL DocGen_Parser(sFilename.s, ptrInclude.l)
                   EndIf
                   ; Debug "Constant > " + \sName
                   ; Debug "Constant > Value > " + \sValue
+                  ; Debug "Constant > Line > " + Str(plCurLine)
                   psDoc = ""
                   pbFound = #True
                 EndWith

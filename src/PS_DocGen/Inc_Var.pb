@@ -56,6 +56,7 @@ Structure S_TypeConstant
   sDescription.s
   ptrDoc.S_Documentation
   ptrInclude.l
+  ptrLine.l
 EndStructure
 Structure S_TypeProcedure
   bIsC.b

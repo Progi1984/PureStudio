@@ -1,16 +1,33 @@
-ProcedureDLL DocGen_CHM_ConstantExists(psName.s)
-  Protected lIndex.l = ListIndex(LL_ListConstants())
-  Protected lReturn.l = #False
+ProcedureDLL.l DocGen_CHM_ConstantExists(psName.s)
+  Protected plIndex.l = ListIndex(LL_ListConstants())
+  Protected plReturn.l = #False
+  Protected pbNumber.b = 0
   ForEach LL_ListConstants()
-    If ListIndex(LL_ListConstants()) < lIndex
-      If LL_ListConstants()\sName = psName
-        lReturn = #True
+    If LL_ListConstants()\sName = psName 
+      If pbNumber < 1
+        pbNumber + 1
+      Else
+        plReturn = #True
         Break
       EndIf
     EndIf
   Next
-  SelectElement(LL_ListConstants(), lIndex)
-  ProcedureReturn lReturn
+  SelectElement(LL_ListConstants(), plIndex)
+  ProcedureReturn plReturn
+EndProcedure
+ProcedureDLL.s DocGen_CHM_GetFilenameOfInclude(ptrInclude.l, bJustname.b = #False)
+  SelectElement(LL_IncludeFiles(), ptrInclude)
+  With LL_IncludeFiles()
+    If bJustname = #True
+      ProcedureReturn \sFilename
+    Else
+      If \sPath = ""
+        ProcedureReturn \sFilename
+      Else
+        ProcedureReturn \sPath + "_" + \sFilename
+      EndIf
+    EndIf
+  EndWith
 EndProcedure
 ProcedureDLL DocGen_ExportCHM(sPath.s)
   Protected lFileIDHTML.l, lIncA.l,plNbItems.l
@@ -43,9 +60,9 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   psCSSforHTML + "p, div {"+HTML_ReturnCSSFormat(@pFormatP)+HTML_ReturnCSSParagraph(@pStyleP)+"}" + #System_EOL
  
   ; Procedures
-  ;- TODO : Procedures > Source : ajouter le nom, les paramètres et le type
-  SortStructuredList(LL_ListProcedures(), #PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeProcedure\sName), #PB_Sort_String)
+  ;- TODO : Procedures > Source : ajouter le nom, les paramètres et le type (alias la declaration de la fonction)
   ;{ Export HTML > All Procedures
+    SortStructuredList(LL_ListProcedures(), #PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeProcedure\sName), #PB_Sort_String)
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "functions.html")
       HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
       HTML_SetTitle(lFileIDHTML, "Functions")
@@ -151,7 +168,6 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   ;}
   
   ; Constantes
-  ;- TODO : Get CompilerIf
   ;{ Export HTML > All Constants
     SortStructuredList(LL_ListConstants(),#PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeConstant\sName), #PB_Sort_String)
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "constants.html")
@@ -163,8 +179,12 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
       HTML_OpenParagraph(lFileIDHTML)
         ForEach LL_ListConstants()
           With LL_ListConstants()
-            If Left(ReplaceString(\sName, "#", ""),3) <> "PB_" And DocGen_CHM_ConstantExists(\sName) = #False
-              HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "Constants/"+ ReplaceString(\sName, "#", "") + ".html" + #DQuote + ">" + \sName + "</a>")
+            If Left(ReplaceString(\sName, "#", ""),3) <> "PB_"
+              If DocGen_CHM_ConstantExists(\sName) = #True
+                HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "Constants/"+ ReplaceString(\sName, "#", "") + "_" + Str(\ptrInclude) + ".html" + #DQuote + ">" + \sName + "</a> (<a href=" + #DQuote + "IncludeFiles/"+ DocGen_CHM_GetFilenameOfInclude(\ptrInclude) + ".html" + #DQuote + ">" + DocGen_CHM_GetFilenameOfInclude(\ptrInclude, #True) + "</a> (l." + Str(\ptrLine) + "))")
+              Else
+                HTML_AddText(lFileIDHTML, "<a href=" + #DQuote + "Constants/"+ ReplaceString(\sName, "#", "") + ".html" + #DQuote + ">" + \sName + "</a>")
+              EndIf
               HTML_AddNewLine(lFileIDHTML)
             EndIf
           EndWith
@@ -179,9 +199,13 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
     CreateDirectory(sPath + "Constants")
     ForEach LL_ListConstants()
       With LL_ListConstants()
-        If Left(ReplaceString(\sName, "#", ""),3) <> "PB_" And DocGen_CHM_ConstantExists(\sName) = #False
+        If Left(ReplaceString(\sName, "#", ""),3) <> "PB_"
           DocGen_ParserDoc(\sDescription, @LL_ListConstants()\ptrDoc)
-          lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "Constants"+ #System_Separator + ReplaceString(\sName, "#", "") + ".html")
+          If DocGen_CHM_ConstantExists(\sName) = #True
+            lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "Constants"+ #System_Separator + ReplaceString(\sName, "#", "") + "_" + Str(\ptrInclude) + ".html")
+          Else
+            lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "Constants"+ #System_Separator + ReplaceString(\sName, "#", "") + ".html")
+          EndIf
           ; head 
           HTML_SetGenerator(lFileIDHTML, "PS_DocGen from PureStudio - RootsLabs")
           HTML_SetTitle(lFileIDHTML, \sName)
