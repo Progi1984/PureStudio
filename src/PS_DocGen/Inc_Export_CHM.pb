@@ -60,7 +60,6 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
   psCSSforHTML + "p, div {"+HTML_ReturnCSSFormat(@pFormatP)+HTML_ReturnCSSParagraph(@pStyleP)+"}" + #System_EOL
  
   ; Procedures
-  ;- TODO : Procedures > Source : ajouter le nom, les paramètres et le type (alias la declaration de la fonction)
   ;{ Export HTML > All Procedures
     SortStructuredList(LL_ListProcedures(), #PB_Sort_Ascending|#PB_Sort_NoCase, OffsetOf(S_TypeProcedure\sName), #PB_Sort_String)
     lFileIDHTML = HTML_CreateFile(#PB_Any, sPath  + "functions.html")
@@ -97,7 +96,7 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
         ;{ Syntax
           HTML_AddHeader(lFileIDHTML, 2, "Syntax")
           HTML_OpenParagraph(lFileIDHTML)
-            HTML_OpenBlock(lFileIDHTML, @pFormatProcedureName)
+            HTML_OpenBlock(lFileIDHTML, #Null, @pFormatProcedureName)
               HTML_AddText(lFileIDHTML, \sName)
             HTML_CloseBlock(lFileIDHTML)
             HTML_AddText(lFileIDHTML, "(")
@@ -150,6 +149,38 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
           If \sContent > ""
             HTML_AddHeader(lFileIDHTML, 2, "Source")
             HTML_OpenParagraph(lFileIDHTML)
+              ; "Procedure(C)(DLL)
+              If \bIsC = #True
+                If \bIsDLL = #True
+                  HTML_AddText(lFileIDHTML, "ProcedureCDLL")
+                Else
+                  HTML_AddText(lFileIDHTML, "ProcedureC")
+                EndIf
+              Else
+                If \bIsDLL = #True
+                  HTML_AddText(lFileIDHTML, "ProcedureDLL")
+                Else
+                  HTML_AddText(lFileIDHTML, "Procedure")
+                EndIf
+              EndIf
+              ; ".x"
+              If \sType > ""
+                HTML_AddText(lFileIDHTML, "." + \sType)
+              EndIf
+              HTML_AddText(lFileIDHTML, " ")
+              ; "MyFunc"
+              HTML_AddText(lFileIDHTML, \sName)
+              ; "(myparam)"
+              If \sParameterName > ""
+                HTML_AddText(lFileIDHTML, "(")
+                For lIncA = 0 To CountString(\sParameterName, "|")
+                  HTML_AddText(lFileIDHTML, StringField(\sParameterName, lIncA + 1, "|") + "." + StringField(\sParameterType, lIncA + 1, "|"))
+                Next
+                HTML_AddText(lFileIDHTML, ")")
+              Else
+                HTML_AddText(lFileIDHTML, "()")
+              EndIf
+              ; Content & EndProcedure
               psContent = ReplaceString(\sContent, Chr(13) + Chr(10), "<br />")
               psContent = ReplaceString(psContent, Chr(10), "<br />")
               HTML_AddText(lFileIDHTML, psContent)
@@ -693,10 +724,16 @@ ProcedureDLL DocGen_ExportCHM(sPath.s)
           HTML_OpenParagraph(lFileIDHTML)
             plNbItems =0
             ForEach LL_ListConstants()
-              If LL_ListConstants()\ptrInclude = ListIndex(LL_IncludeFiles())
-                HTML_AddText(lFileIDHTML, "<a href="+#DQuote + "../Constants/"+ReplaceString(LL_ListConstants()\sName, "#", "")+".html"+#DQuote+">"+LL_ListConstants()\sName+"</a>")
-                HTML_AddNewLine(lFileIDHTML)
-                plNbItems + 1
+              If Left(ReplaceString(LL_ListConstants()\sName, "#", ""),3) <> "PB_"
+                If LL_ListConstants()\ptrInclude = ListIndex(LL_IncludeFiles())
+                  If DocGen_CHM_ConstantExists(LL_ListConstants()\sName) = #True
+                    HTML_AddText(lFileIDHTML, "<a href="+#DQuote + "../Constants/"+ReplaceString(LL_ListConstants()\sName, "#", "") + "_" + Str(LL_ListConstants()\ptrInclude) +".html"+#DQuote+">"+LL_ListConstants()\sName+"</a>")
+                  Else
+                    HTML_AddText(lFileIDHTML, "<a href="+#DQuote + "../Constants/"+ReplaceString(LL_ListConstants()\sName, "#", "")+".html"+#DQuote+">"+LL_ListConstants()\sName+"</a>")
+                  EndIf
+                  HTML_AddNewLine(lFileIDHTML)
+                  plNbItems + 1
+                EndIf
               EndIf
             Next
             If plNbItems = 0
