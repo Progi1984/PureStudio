@@ -17,13 +17,20 @@ IncludePath "PS_DocGen"
   XIncludeFile "Inc_Export.pb"
   XIncludeFile "Main.pb"
 
-gsProject\sFilename = "/home/franklin/Documents/Projets/Moebius/Moebius_Main.pb"
+CompilerSelect #PB_Compiler_OS
+  CompilerCase #PB_OS_Linux : gsProject\sFilename = "/home/franklin/Documents/Projets/Moebius/Moebius_Main.pb"
+  CompilerCase #PB_OS_Windows : gsProject\sFilename = "K:\Moebius\Moebius_Main.pb"
+CompilerEndSelect
 gsProject\sName = "Moebius"
 gsProject\sAuthor = "Progi1984"
 
 AddElement(LL_Exports())
 LL_Exports()\lType             = #ExportType_CHM
-LL_Exports()\sPathExport  = "/home/franklin/Documents/Projets/PureStudio/data/PS_DocGen_CHM/"
+CompilerSelect #PB_Compiler_OS
+  CompilerCase #PB_OS_Linux : LL_Exports()\sPathExport  = "/home/franklin/Documents/Projets/PureStudio/data/PS_DocGen_CHM/"
+  CompilerCase #PB_OS_Windows : LL_Exports()\sPathExport = "K:\PureStudio\data\PS_DocGen_CHM\"
+CompilerEndSelect
+
 LL_Exports()\sFileExport   = "Moebius.chm"
 
 If FileSize(gsProject\sFilename) > 0
