@@ -2,7 +2,7 @@
 ; http://www.dokuwiki.org/syntax
 
 ;{ Object Management
-  Global Objects_TextHtml.l
+  
   ; Structures
   Structure S_TextHtml
     sFilename.s
@@ -40,6 +40,12 @@
   Macro TextHtml_INIT(PtrCloseFn)
     Object_Init(SizeOf(S_TextHtml), 1, PtrCloseFn)
   EndMacro
+  ; Initialization object
+  If Defined(Objects_TextHtml, #PB_Variable) = #False
+    Declare.l HTML_FreeFile(ID.l)
+    Global Objects_TextHtml.l
+    Objects_TextHtml = TextHtml_INIT(@HTML_FreeFile())
+  EndIf
 ;}
 
 Enumeration 1 ; #HTML_Alignment
@@ -82,7 +88,6 @@ Structure S_HTML_Style_Format
   sBackgroundColor.s
 EndStructure
 
-  Declare.l HTML_CloseFile(ID.l)
   
   ProcedureDLL.s HTML_ReturnCSSFormat(*Format.S_HTML_Style_Format)
     Protected sCSS.s
@@ -185,19 +190,27 @@ EndStructure
   EndProcedure
   
   ProcedureDLL.l HTML_CreateFile(ID.l, Filename.s)
-    ; Initialization object
-    If Objects_TextHtml = 0
-      Objects_TextHtml = TextHtml_INIT(@HTML_CloseFile())
-    EndIf
     ; CreateFile
     Protected *Object.S_TextHtml = TextHtml_NEW(ID)
-     With *Object
+    If *Object
+      With *Object
         \sFilename = Filename
-     EndWith
-    ProcedureReturn *Object
+      EndWith
+      ProcedureReturn *Object
+    Else
+      ProcedureReturn #False
+    EndIf
   EndProcedure
-  ProcedureDLL.l HTML_CloseFile(ID.l)
-    Protected *Object.S_TextHtml= TextHtml_ID(ID)
+  Procedure.l HTML_FreeFile(ID.l)
+    Protected *Object.S_TextHtml
+    ; Releasing object
+    If *Object
+      TextHtml_FREEID(ID)
+    EndIf
+    ProcedureReturn #True
+  EndProcedure
+  Procedure.l HTML_CloseFile(ID.l)
+    Protected *Object.S_TextHtml = TextHtml_ID(ID)
     Protected sHTMLContent.s
     Protected lHTMLFile.l
     If *Object
@@ -266,11 +279,8 @@ EndStructure
           WriteString(lHTMLFile, sHTMLContent)
           CloseFile(lHTMLFile)
         EndIf
+        HTML_FreeFile(ID)
       EndWith
-    EndIf
-    ; Releasing object
-    If *Object
-      TextHtml_FREEID(ID)
     EndIf
     ProcedureReturn #True
   EndProcedure

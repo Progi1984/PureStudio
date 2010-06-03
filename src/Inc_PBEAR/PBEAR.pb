@@ -7,13 +7,13 @@
     CompilerCase #False ;{ THREADSAFE : OFF
       CompilerSelect #PB_Compiler_OS
         CompilerCase #PB_OS_Linux         : #Power_ObjectManagerLib = #PB_Compiler_Home + "compilers/objectmanager.a"
-        CompilerCase #PB_OS_Windows   : #Power_ObjectManagerLib = "ObjectManager.lib"
+        CompilerCase #PB_OS_Windows   : #Power_ObjectManagerLib = #PB_Compiler_Home + "compilers\ObjectManager.lib"
       CompilerEndSelect
     ;}
     CompilerCase #True ;{ THREADSAFE : ON
       CompilerSelect #PB_Compiler_OS
         CompilerCase #PB_OS_Linux         : #Power_ObjectManagerLib = #PB_Compiler_Home + "compilers/objectmanagerthread.a"
-        CompilerCase #PB_OS_Windows   : #Power_ObjectManagerLib = "ObjectManager.lib"
+        CompilerCase #PB_OS_Windows   : #Power_ObjectManagerLib = #PB_Compiler_Home + "compilers\ObjectManagerThread.lib"
       CompilerEndSelect
     ;}
   CompilerEndSelect
@@ -31,7 +31,10 @@
     ;}
   CompilerEndSelect
   ; Import the ObjectManager library
-  ImportC #Power_ObjectManagerLib
+  CompilerSelect #PB_Compiler_OS
+    CompilerCase #PB_OS_Linux : ImportC #Power_ObjectManagerLib
+    CompilerCase #PB_OS_Windows : Import #Power_ObjectManagerLib
+  CompilerEndSelect
     Object_GetOrAllocateID(Objects, Object.l) As ImportFunction(PB_Object_GetOrAllocateID, 8)
     Object_GetObject(Objects, Object.l) As ImportFunction(PB_Object_GetObject,8)
     Object_IsObject(Objects, Object.l) As ImportFunction(PB_Object_IsObject,8)
