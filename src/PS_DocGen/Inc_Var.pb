@@ -145,6 +145,7 @@ Global NewList LL_ListProcedures.S_TypeProcedure()
 
 ;-Globals
 Global gsProject.S_Documentation
+Global glLogFile.l
 
 ;-Macros
 Macro MR_Error(sError)
