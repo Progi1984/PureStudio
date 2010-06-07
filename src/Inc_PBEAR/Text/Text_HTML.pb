@@ -2,7 +2,6 @@
 ; http://www.dokuwiki.org/syntax
 
 ;{ Object Management
-  
   ; Structures
   Structure S_TextHtml
     sFilename.s
@@ -88,7 +87,104 @@ Structure S_HTML_Style_Format
   sBackgroundColor.s
 EndStructure
 
-  
+  ; Private
+  Procedure.l HTML_FreeFile(ID.l)
+    Protected *Object.S_TextHtml
+    ; Releasing object
+    If *Object
+      TextHtml_FREEID(ID)
+    EndIf
+    ProcedureReturn #True
+  EndProcedure
+  ; Public  
+  ProcedureDLL.l HTML_CreateFile(ID.l, Filename.s)
+    ; CreateFile
+    Protected *Object.S_TextHtml = TextHtml_NEW(ID)
+    If *Object
+      With *Object
+        \sFilename = Filename
+      EndWith
+      ProcedureReturn *Object
+    Else
+      ProcedureReturn #False
+    EndIf
+  EndProcedure
+  ProcedureDLL.l HTML_CloseFile(ID.l)
+    Protected *Object.S_TextHtml = TextHtml_ID(ID)
+    Protected sHTMLContent.s
+    Protected lHTMLFile.l
+    If *Object
+      With *Object
+        ; html
+        sHTMLContent + "<!DOCTYPE html PUBLIC "+Chr(34)+"-//W3C//DTD XHTML 1.1//EN"+Chr(34)+" "+Chr(34)+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"+Chr(34)+">" + #CRLF$
+        sHTMLContent + "<html>" + #CRLF$
+        ; head
+        sHTMLContent + "<head>"+ #CRLF$
+        If \sTitle <> ""
+          sHTMLContent + "<title>"+ \sTitle + "</title>"+ #CRLF$
+        EndIf
+        If \sAuthor <> ""
+          sHTMLContent + "<meta name="+Chr(34)+"author"+Chr(34)+" content="+Chr(34)+\sAuthor+Chr(34)+" />"+ #CRLF$
+        EndIf
+        If \sDescription <> ""
+          sHTMLContent + "<meta name="+Chr(34)+"description"+Chr(34)+" content="+Chr(34)+\sDescription+Chr(34)+" />"+ #CRLF$
+        EndIf
+        If \sKeywords <> ""
+          sHTMLContent + "<meta name="+Chr(34)+"keywords"+Chr(34)+" content="+Chr(34)+\sKeywords+Chr(34)+" />"+ #CRLF$
+        EndIf
+        If \sGenerator <> ""
+          sHTMLContent + "<meta name="+Chr(34)+"generator"+Chr(34)+" content="+Chr(34)+\sGenerator+Chr(34)+" />"+ #CRLF$
+        EndIf
+        If \lEncoding > 0
+          ; http://htmlhelp.com/tools/validator/supported-encodings.html.en
+          sHTMLContent + "<meta name="+Chr(34)+"Content-Type"+Chr(34)+" content="+Chr(34)+"text/html; charset="
+          Select \lEncoding
+            Case #PB_UTF16 : sHTMLContent + "UTF-16"
+            Case #PB_UTF16BE : sHTMLContent + "UTF-16BE"
+            Case #PB_UTF32 : sHTMLContent + "UTF-16"
+            Case #PB_UTF32BE : sHTMLContent + "UTF-16BE"
+            Case #PB_UTF8 : sHTMLContent + "UTF-8"
+            Case #PB_Ascii : sHTMLContent + "ISO-8859-1"
+            Case #PB_Unicode : sHTMLContent + "UTF-8"
+          EndSelect
+          sHTMLContent+Chr(34)+" />"+ #CRLF$
+        EndIf
+        If \lExternJSFileNb > 0
+          For lInc = 0 To \lExternJSFileNb -1
+            sHTMLContent + "<script src="+Chr(34)+\dimExternJSFile[lInc]+Chr(34)+" type="+Chr(34)+"text/javascript"+Chr(34)+">"+ #CRLF$
+          Next
+        EndIf
+        If \lExternCSSFileNb > 0
+          For lInc = 0 To \lExternCSSFileNb -1
+            sHTMLContent + "<link href="+Chr(34)+\dimExternJSFile[lInc]+Chr(34)+" rel="+Chr(34)+"stylesheet"+Chr(34)+" type="+Chr(34)+"text/css"+Chr(34)+">"+ #CRLF$
+          Next
+        EndIf
+        If \sInternJSFile <> ""
+          sHTMLContent + "<script language="+Chr(34)+"javascript"+Chr(34)+">"+#CRLF$+\sInternJSFile+"</script>"+ #CRLF$
+        EndIf
+        If \sInternCSSFile <> ""
+          sHTMLContent + "<style type="+Chr(34)+"text/css"+Chr(34)+">"+#CRLF$+\sInternCSSFile+"</style>"+ #CRLF$
+        EndIf
+        sHTMLContent + "</head>"+ #CRLF$
+        ; body
+        sHTMLContent + "<body>"+ #CRLF$
+        sHTMLContent + \sContent+ #CRLF$
+        sHTMLContent + "</body>"+ #CRLF$
+        ; html
+        sHTMLContent + "</html>"
+        
+        ;Write HTML File
+        lHTMLFile = CreateFile(#PB_Any, \sFilename)
+        If lHTMLFile
+          WriteString(lHTMLFile, sHTMLContent)
+          CloseFile(lHTMLFile)
+        EndIf
+        HTML_FreeFile(ID)
+      EndWith
+    EndIf
+    ProcedureReturn #True
+  EndProcedure
+  ;-CSS
   ProcedureDLL.s HTML_ReturnCSSFormat(*Format.S_HTML_Style_Format)
     Protected sCSS.s
     If *Format <> #Null
@@ -187,102 +283,6 @@ EndStructure
     Else
       ProcedureReturn ""
     EndIf
-  EndProcedure
-  
-  ProcedureDLL.l HTML_CreateFile(ID.l, Filename.s)
-    ; CreateFile
-    Protected *Object.S_TextHtml = TextHtml_NEW(ID)
-    If *Object
-      With *Object
-        \sFilename = Filename
-      EndWith
-      ProcedureReturn *Object
-    Else
-      ProcedureReturn #False
-    EndIf
-  EndProcedure
-  Procedure.l HTML_FreeFile(ID.l)
-    Protected *Object.S_TextHtml
-    ; Releasing object
-    If *Object
-      TextHtml_FREEID(ID)
-    EndIf
-    ProcedureReturn #True
-  EndProcedure
-  Procedure.l HTML_CloseFile(ID.l)
-    Protected *Object.S_TextHtml = TextHtml_ID(ID)
-    Protected sHTMLContent.s
-    Protected lHTMLFile.l
-    If *Object
-      With *Object
-        ; html
-        sHTMLContent + "<!DOCTYPE html PUBLIC "+Chr(34)+"-//W3C//DTD XHTML 1.1//EN"+Chr(34)+" "+Chr(34)+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd"+Chr(34)+">" + #CRLF$
-        sHTMLContent + "<html>" + #CRLF$
-        ; head
-        sHTMLContent + "<head>"+ #CRLF$
-        If \sTitle <> ""
-          sHTMLContent + "<title>"+ \sTitle + "</title>"+ #CRLF$
-        EndIf
-        If \sAuthor <> ""
-          sHTMLContent + "<meta name="+Chr(34)+"author"+Chr(34)+" content="+Chr(34)+\sAuthor+Chr(34)+" />"+ #CRLF$
-        EndIf
-        If \sDescription <> ""
-          sHTMLContent + "<meta name="+Chr(34)+"description"+Chr(34)+" content="+Chr(34)+\sDescription+Chr(34)+" />"+ #CRLF$
-        EndIf
-        If \sKeywords <> ""
-          sHTMLContent + "<meta name="+Chr(34)+"keywords"+Chr(34)+" content="+Chr(34)+\sKeywords+Chr(34)+" />"+ #CRLF$
-        EndIf
-        If \sGenerator <> ""
-          sHTMLContent + "<meta name="+Chr(34)+"generator"+Chr(34)+" content="+Chr(34)+\sGenerator+Chr(34)+" />"+ #CRLF$
-        EndIf
-        If \lEncoding > 0
-          ; http://htmlhelp.com/tools/validator/supported-encodings.html.en
-          sHTMLContent + "<meta name="+Chr(34)+"Content-Type"+Chr(34)+" content="+Chr(34)+"text/html; charset="
-          Select \lEncoding
-            Case #PB_UTF16 : sHTMLContent + "UTF-16"
-            Case #PB_UTF16BE : sHTMLContent + "UTF-16BE"
-            Case #PB_UTF32 : sHTMLContent + "UTF-16"
-            Case #PB_UTF32BE : sHTMLContent + "UTF-16BE"
-            Case #PB_UTF8 : sHTMLContent + "UTF-8"
-            Case #PB_Ascii : sHTMLContent + "ISO-8859-1"
-            Case #PB_Unicode : sHTMLContent + "UTF-8"
-          EndSelect
-          sHTMLContent+Chr(34)+" />"+ #CRLF$
-        EndIf
-        If \lExternJSFileNb > 0
-          For lInc = 0 To \lExternJSFileNb -1
-            sHTMLContent + "<script src="+Chr(34)+\dimExternJSFile[lInc]+Chr(34)+" type="+Chr(34)+"text/javascript"+Chr(34)+">"+ #CRLF$
-          Next
-        EndIf
-        If \lExternCSSFileNb > 0
-          For lInc = 0 To \lExternCSSFileNb -1
-            sHTMLContent + "<link href="+Chr(34)+\dimExternJSFile[lInc]+Chr(34)+" rel="+Chr(34)+"stylesheet"+Chr(34)+" type="+Chr(34)+"text/css"+Chr(34)+">"+ #CRLF$
-          Next
-        EndIf
-        If \sInternJSFile <> ""
-          sHTMLContent + "<script language="+Chr(34)+"javascript"+Chr(34)+">"+#CRLF$+\sInternJSFile+"</script>"+ #CRLF$
-        EndIf
-        If \sInternCSSFile <> ""
-          sHTMLContent + "<style type="+Chr(34)+"text/css"+Chr(34)+">"+#CRLF$+\sInternCSSFile+"</style>"+ #CRLF$
-        EndIf
-        sHTMLContent + "</head>"+ #CRLF$
-        ; body
-        sHTMLContent + "<body>"+ #CRLF$
-        sHTMLContent + \sContent+ #CRLF$
-        sHTMLContent + "</body>"+ #CRLF$
-        ; html
-        sHTMLContent + "</html>"
-        
-        ;Write HTML File
-        lHTMLFile = CreateFile(#PB_Any, \sFilename)
-        If lHTMLFile
-          WriteString(lHTMLFile, sHTMLContent)
-          CloseFile(lHTMLFile)
-        EndIf
-        HTML_FreeFile(ID)
-      EndWith
-    EndIf
-    ProcedureReturn #True
   EndProcedure
   ;- Header
   ProcedureDLL HTML_SetAuthor(ID.l, Author.s)
@@ -665,4 +665,3 @@ EndStructure
         ProcedureReturn #False
       EndIf
   EndProcedure
-  
