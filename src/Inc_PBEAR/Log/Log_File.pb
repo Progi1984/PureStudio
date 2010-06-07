@@ -77,10 +77,10 @@
   ; Private
   Procedure.l LogFile_WriteLineLog(*RObject.S_LogFile, lFileID.l, *Item.S_LogFile_Log)
     Protected bFilterOk.b
+    Protected sContent.s
     If *RObject
-      Protected sContent.s
       With *RObject
-        bbFilterOk = #True
+        bFilterOk = #True
         If \lFilterActivateLevel = #True
          If \lFilterOperatorLevel = #LogFile_Operator_Equal
             If *Item\lLevel =  \lFilterContentLevel  : bFilterOk = #True  : Else  : bFilterOk = #False : EndIf
@@ -129,7 +129,7 @@
           sContent = ReplaceString(sContent, "%ss", Str(Second(*Item\lDate)))
           sContent = ReplaceString(sContent, "%cat", *Item\sCategory)
           sContent = ReplaceString(sContent, "%level", Str(*Item\lLevel))
-          sContent = ReplaceString(sContent, "%Content", *Item\sContent)
+          sContent = ReplaceString(sContent, "%content", *Item\sContent)
           ; Tools
           sContent = ReplaceString(sContent, "%%",  "%")
           sContent = ReplaceString(sContent, "%n", Chr(10))
@@ -137,7 +137,7 @@
           sContent = ReplaceString(sContent, "%t", Chr(9))
           sContent = ReplaceString(sContent, "%v", Chr(11))
           sContent = ReplaceString(sContent, "%f", Chr(12))
-          WriteStringN(FileID, sContent)
+          WriteStringN(lFileID, sContent)
         EndIf
       EndWith
       ProcedureReturn #True
@@ -172,21 +172,21 @@
     EndIf
     ProcedureReturn #True
   EndProcedure
-  ProcedureDLL.l LogFile_AddLog(Id.l, sContent.s, sCategory.s = "", lLevel.l = -1)
-    Protected *RObject.S_LogFile = LogFile_ID(Id)
+  ProcedureDLL.l LogFile_AddLog(ID.l, sContent.s, sCategory.s = "", lLevel.l = -1)
+    Protected *RObject.S_LogFile = LogFile_ID(ID)
     Protected lFileID.l
     If *RObject
       With *RObject
         LastElement(LL_LogFile_Logs())
         AddElement(LL_LogFile_Logs())
-        LL_LogFile_Logs()\ptrIDLog     = Id
+        LL_LogFile_Logs()\ptrIDLog = ID
         If lLevel = -1
           LL_LogFile_Logs()\lLevel    = \lDefaultLevel
         Else
           LL_LogFile_Logs()\lLevel    = lLevel
         EndIf
-        LL_LogFile_Logs()\lDate       = Date()
-        LL_LogFile_Logs()\sContent    = sContent
+        LL_LogFile_Logs()\lDate = Date()
+        LL_LogFile_Logs()\sContent = sContent
         If sCategory = ""
           LL_LogFile_Logs()\sCategory = \sDefaultCategory
         Else
@@ -206,12 +206,12 @@
       ProcedureReturn #False
     EndIf
   EndProcedure
-  ProcedureDLL.l LogFile_ResetLog(Id.l)
-    Protected *RObject.S_LogFile = LogFile_ID(Id)
+  ProcedureDLL.l LogFile_ResetLog(ID.l)
+    Protected *RObject.S_LogFile = LogFile_ID(ID)
     If *RObject
       With *RObject
         ForEach LL_LogFile_Logs()
-          If LL_LogFile_Logs()\ptrIDLog = Id
+          If LL_LogFile_Logs()\ptrIDLog = ID
             DeleteElement(LL_LogFile_Logs())
           EndIf
         Next
@@ -221,8 +221,8 @@
       ProcedureReturn #False
     EndIf
   EndProcedure
-  ProcedureDLL.l LogFile_SetDefaultLevel(Id.l, lLevel.l)
-    Protected *RObject.S_LogFile = LogFile_ID(Id)
+  ProcedureDLL.l LogFile_SetDefaultLevel(ID.l, lLevel.l)
+    Protected *RObject.S_LogFile = LogFile_ID(ID)
     If *RObject
       With *RObject
         \lDefaultLevel = lLevel
@@ -232,8 +232,8 @@
       ProcedureReturn #False
     EndIf
   EndProcedure
-  ProcedureDLL.l LogFile_GetDefaultLevel(Id.l)
-    Protected *RObject.S_LogFile = LogFile_ID(Id)
+  ProcedureDLL.l LogFile_GetDefaultLevel(ID.l)
+    Protected *RObject.S_LogFile = LogFile_ID(ID)
     If *RObject
       With *RObject
         ProcedureReturn \lDefaultLevel
@@ -242,8 +242,8 @@
       ProcedureReturn #False
     EndIf
   EndProcedure
-  ProcedureDLL.l LogFile_SetDefaultCategory(Id.l, sCategory.s)
-    Protected *RObject.S_LogFile = LogFile_ID(Id)
+  ProcedureDLL.l LogFile_SetDefaultCategory(ID.l, sCategory.s)
+    Protected *RObject.S_LogFile = LogFile_ID(ID)
     If *RObject
       With *RObject
         \sDefaultCategory = sCategory 
@@ -253,8 +253,8 @@
       ProcedureReturn #False
     EndIf
   EndProcedure
-  ProcedureDLL.s LogFile_GetDefaultCategory(Id.l)
-    Protected *RObject.S_LogFile = LogFile_ID(Id)
+  ProcedureDLL.s LogFile_GetDefaultCategory(ID.l)
+    Protected *RObject.S_LogFile = LogFile_ID(ID)
     If *RObject
       With *RObject
         ProcedureReturn \sDefaultCategory 
@@ -263,8 +263,8 @@
       ProcedureReturn ""
     EndIf
   EndProcedure
-  ProcedureDLL.l LogFile_SetOutputFile(Id.l, sFilename.s)
-    Protected *RObject.S_LogFile = LogFile_ID(Id)
+  ProcedureDLL.l LogFile_SetOutputFile(ID.l, sFilename.s)
+    Protected *RObject.S_LogFile = LogFile_ID(ID)
     If *RObject
       With *RObject
         \sOutputFile =  sFilename
@@ -274,8 +274,8 @@
       ProcedureReturn #False
     EndIf
   EndProcedure
-  ProcedureDLL.s LogFile_GetOutputFile(Id.l)
-    Protected *RObject.S_LogFile = LogFile_ID(Id)
+  ProcedureDLL.s LogFile_GetOutputFile(ID.l)
+    Protected *RObject.S_LogFile = LogFile_ID(ID)
     If *RObject
       With *RObject
         ProcedureReturn \sOutputFile
@@ -284,8 +284,8 @@
       ProcedureReturn ""
     EndIf
   EndProcedure
-  ProcedureDLL.l LogFile_SetMethod(Id.l, lAppend.l)
-    Protected *RObject.S_LogFile = LogFile_ID(Id)
+  ProcedureDLL.l LogFile_SetMethod(ID.l, lAppend.l)
+    Protected *RObject.S_LogFile = LogFile_ID(ID)
     If *RObject
       With *RObject
         If lAppend >= #True
@@ -299,8 +299,8 @@
       ProcedureReturn #False
     EndIf
   EndProcedure
-  ProcedureDLL.l LogFile_GetMethod(Id.l)
-    Protected *RObject.S_LogFile = LogFile_ID(Id)
+  ProcedureDLL.l LogFile_GetMethod(ID.l)
+    Protected *RObject.S_LogFile = LogFile_ID(ID)
     If *RObject
       With *RObject
         ProcedureReturn \lOutputFileAppend
@@ -309,8 +309,8 @@
       ProcedureReturn #False
     EndIf
   EndProcedure
-  ProcedureDLL.l LogFile_SetFormatter(Id.l, sFormatter.s)
-    Protected *RObject.S_LogFile = LogFile_ID(Id)
+  ProcedureDLL.l LogFile_SetFormatter(ID.l, sFormatter.s)
+    Protected *RObject.S_LogFile = LogFile_ID(ID)
     If *RObject
       With *RObject
         \sDefaultFormatter = sFormatter
@@ -320,8 +320,8 @@
       ProcedureReturn #False
     EndIf
   EndProcedure
-  ProcedureDLL.s LogFile_GetFormatter(Id.l)
-    Protected *RObject.S_LogFile = LogFile_ID(Id)
+  ProcedureDLL.s LogFile_GetFormatter(ID.l)
+    Protected *RObject.S_LogFile = LogFile_ID(ID)
     If *RObject
       With *RObject
         ProcedureReturn \sDefaultFormatter 
@@ -330,8 +330,8 @@
       ProcedureReturn ""
     EndIf
   EndProcedure
-  ProcedureDLL.l LogFile_AddFilter(Id.l, lType.l, lOperator.l, sContent.s)
-    Protected *RObject.S_LogFile = LogFile_ID(Id)
+  ProcedureDLL.l LogFile_AddFilter(ID.l, lType.l, lOperator.l, sContent.s)
+    Protected *RObject.S_LogFile = LogFile_ID(ID)
     If *RObject
       With *RObject
         Select lType
@@ -354,8 +354,8 @@
       ProcedureReturn #False
     EndIf
   EndProcedure
-  ProcedureDLL.l LogFile_ResetFilter(Id.l)
-    Protected *RObject.S_LogFile = LogFile_ID(Id)
+  ProcedureDLL.l LogFile_ResetFilter(ID.l)
+    Protected *RObject.S_LogFile = LogFile_ID(ID)
     If *RObject
       With *RObject
         \lFilterActivateLevel    = #False
@@ -373,15 +373,15 @@
       ProcedureReturn #False
     EndIf
   EndProcedure
-  ProcedureDLL.l LogFile_Save(Id.l)
-    Protected *RObject.S_LogFile = LogFile_ID(Id)
+  ProcedureDLL.l LogFile_Save(ID.l)
+    Protected *RObject.S_LogFile = LogFile_ID(ID)
     Protected lFileID.l
     If *RObject
       With *RObject
-        lFileID = OpenFile(#PB_Any, \sOutputFile)
+        lFileID = CreateFile(#PB_Any, \sOutputFile)
         If lFileID
           ForEach LL_LogFile_Logs()
-            If LL_LogFile_Logs()\ptrIDLog = Id
+            If LL_LogFile_Logs()\ptrIDLog = ID
               LogFile_WriteLineLog(*RObject, lFileID, @LL_LogFile_Logs())
             EndIf
           Next
