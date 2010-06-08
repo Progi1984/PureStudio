@@ -1,13 +1,4 @@
 Procedure Main_DocGen()
-  ; Initialisation
-  glLogFile = LogFile_Create(#PB_Any)
-  If FileSize(GetTemporaryDirectory() + #sApplication_Name + #System_Separator) <> -2
-    CreateDirectory(GetTemporaryDirectory() + #sApplication_Name + #System_Separator) 
-  EndIf
-  LogFile_SetOutputFile(glLogFile, GetTemporaryDirectory() + #sApplication_Name + #System_Separator + "LogFile.log")
-  LogFile_SetFormatter(glLogFile, "[%yyyy.%mm.%dd %hh:%ii:%ss](%cat) - %content")
-  LogFile_AddLog(glLogFile, "Initialisation Completed...")
-
   LogFile_AddLog(glLogFile, "=====")
 
   ; Parsing files
@@ -37,4 +28,48 @@ Procedure Main_DocGen()
    EndIf
    LogFile_Save(glLogFile)
 EndProcedure
-
+Procedure Main_Init()
+  ; Initialisation
+  glLogFile = LogFile_Create(#PB_Any)
+  If FileSize(GetTemporaryDirectory() + #sApplication_Name + #System_Separator) <> -2
+    CreateDirectory(GetTemporaryDirectory() + #sApplication_Name + #System_Separator) 
+  EndIf
+  LogFile_SetOutputFile(glLogFile, GetTemporaryDirectory() + #sApplication_Name + #System_Separator + "LogFile.log")
+  LogFile_SetFormatter(glLogFile, "[%yyyy.%mm.%dd %hh:%ii:%ss](%cat) - %content")
+  LogFile_AddLog(glLogFile, "Initialisation Completed...")
+EndProcedure
+Procedure Main_LoadPrefs()
+  Protected psIniFile.s = ProgramParameter()
+  Protected pbExportCHM.b, pbExportDocbook.b
+  If FileSize(psIniFile) > 0
+    If OpenPreferences(psIniFile) > 0
+      LogFile_AddLog(glLogFile, "Load Prefs")
+      PreferenceGroup("PROJECT")
+      ;{ Project
+        gsProject\sFilename = ReadPreferenceString("Filename", "")
+        LogFile_AddLog(glLogFile, "> Filename : "+ gsProject\sFilename)
+        gsProject\sName = ReadPreferenceString("Name", "")
+        LogFile_AddLog(glLogFile, "> Name : "+ gsProject\sName)
+        gsProject\sAuthor = ReadPreferenceString("Author", "")
+        LogFile_AddLog(glLogFile, "> Author : "+ gsProject\sAuthor)
+      ;}
+      PreferenceGroup("PROJECT_FORMAT")
+      ;{ Project Format
+        pbExportCHM = ReadPreferenceLong("ExportCHM", #False)
+      ;}
+      If pbExportCHM = #True
+        PreferenceGroup("EXPORT_CHM")
+        AddElement(LL_Exports())
+        LL_Exports()\lType             = #ExportType_CHM
+        LL_Exports()\sFileExport   = ReadPreferenceString("FileOutput", "")
+        LL_Exports()\sPathExport  = ReadPreferenceString("PathOutput", "")
+        LogFile_AddLog(glLogFile, "> CHM : FileOutput : " + LL_Exports()\sPathExport + LL_Exports()\sFileExport) 
+      EndIf
+      ClosePreferences()
+    Else
+      LogFile_AddLog(glLogFile, "ERROR : <" + psIniFile + "> can't be opened as a preferences file")
+    EndIf 
+  Else
+    LogFile_AddLog(glLogFile, "ERROR : <" + psIniFile + "> has a filesize equal to 0")
+  EndIf
+EndProcedure
