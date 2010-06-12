@@ -50,7 +50,7 @@
   EndIf
 ;}
 
-  Enumeration 1
+  Enumeration 1 ; #LogFile_Level
     #LogFile_Level_Debug
     #LogFile_Level_Info
     #LogFile_Level_Notice
@@ -60,12 +60,12 @@
     #LogFile_Level_Alert
     #LogFile_Level_Emergency
   EndEnumeration
-  Enumeration 1
+  Enumeration 1 ; #LogFile_Filter
     #LogFile_Filter_Level
     #LogFile_Filter_Date
     #LogFile_Filter_Category
   EndEnumeration
-  Enumeration 1
+  Enumeration 1 ; #LogFile_Operator
     #LogFile_Operator_Inferior
     #LogFile_Operator_InferiorOrEqual
     #LogFile_Operator_Superior
@@ -73,7 +73,7 @@
     #LogFile_Operator_Equal
     #LogFile_Operator_NotEqual
   EndEnumeration
-  
+
   ; Private
   Procedure.l LogFile_WriteLineLog(*RObject.S_LogFile, lFileID.l, *Item.S_LogFile_Log)
     Protected bFilterOk.b
@@ -122,11 +122,37 @@
         If bFilterOk = #True
           sContent = \sDefaultFormatter
           sContent = ReplaceString(sContent, "%yyyy", Str(Year(*Item\lDate)))
-          sContent = ReplaceString(sContent, "%mm", Str(Month(*Item\lDate)))
-          sContent = ReplaceString(sContent, "%dd", Str(Day(*Item\lDate)))
-          sContent = ReplaceString(sContent, "%hh", Str(Month(*Item\lDate)))
-          sContent = ReplaceString(sContent, "%ii", Str(Minute(*Item\lDate)))
-          sContent = ReplaceString(sContent, "%ss", Str(Second(*Item\lDate)))
+          sContent = ReplaceString(sContent, "%yy", Right(Str(Year(*Item\lDate)), 2))
+          If Month(*Item\lDate) < 10
+            sContent = ReplaceString(sContent, "%mm", "0" + Str(Month(*Item\lDate)))
+          Else
+            sContent = ReplaceString(sContent, "%mm", Str(Month(*Item\lDate)))
+          EndIf
+          sContent = ReplaceString(sContent, "%m", Str(Month(*Item\lDate)))
+          If Day(*Item\lDate) < 10
+            sContent = ReplaceString(sContent, "%dd", "0" + Str(Day(*Item\lDate)))
+          Else
+            sContent = ReplaceString(sContent, "%dd", Str(Day(*Item\lDate)))
+          EndIf
+          sContent = ReplaceString(sContent, "%d", Str(Day(*Item\lDate)))
+          If Hour(*Item\lDate) < 10
+            sContent = ReplaceString(sContent, "%hh", "0" + Str(Hour(*Item\lDate)))
+          Else
+            sContent = ReplaceString(sContent, "%hh", Str(Hour(*Item\lDate)))
+          EndIf
+          sContent = ReplaceString(sContent, "%h", Str(Hour(*Item\lDate)))
+          If Minute(*Item\lDate) < 10
+            sContent = ReplaceString(sContent, "%ii", "0" + Str(Minute(*Item\lDate)))
+          Else
+            sContent = ReplaceString(sContent, "%ii", Str(Minute(*Item\lDate)))
+          EndIf
+          sContent = ReplaceString(sContent, "%i", Str(Minute(*Item\lDate)))
+          If Second(*Item\lDate) < 10
+            sContent = ReplaceString(sContent, "%ss", "0" + Str(Second(*Item\lDate)))
+          Else
+            sContent = ReplaceString(sContent, "%ss", Str(Second(*Item\lDate)))
+          EndIf
+          sContent = ReplaceString(sContent, "%s", Str(Second(*Item\lDate)))
           sContent = ReplaceString(sContent, "%cat", *Item\sCategory)
           sContent = ReplaceString(sContent, "%level", Str(*Item\lLevel))
           sContent = ReplaceString(sContent, "%content", *Item\sContent)

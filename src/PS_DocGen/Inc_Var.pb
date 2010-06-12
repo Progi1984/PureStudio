@@ -8,14 +8,20 @@ Structure S_Documentation
   sLink.s
   sSample.s
 EndStructure
+Structure S_FileInclude
+  sPath.s
+  sFilename.s
+EndStructure
+Structure S_TypeExport_CHM
+  sCHMCompiler.s
+EndStructure
 Structure S_TypeExport
   lType.l
   sPathExport.s
   sFileExport.s
-EndStructure
-Structure S_FileInclude
-  sPath.s
-  sFilename.s
+  StructureUnion
+    ExportCHM.S_TypeExport_CHM
+  EndStructureUnion
 EndStructure
 Structure S_TypeStructure
   sName.s
@@ -76,7 +82,7 @@ Structure S_TypeProcedure
 EndStructure
 
 ;-Constantes
-Enumeration ; ExportType
+Enumeration ; #ExportType
   #ExportType_CHM
   #ExportType_DOC_97
   #ExportType_DOC_2003
@@ -101,7 +107,7 @@ Enumeration ; ExportType
   #ExportType_XPS
   #ExportType_Troff
 EndEnumeration
-Enumeration ; Regex
+Enumeration ; #Regex
   #Regex_Array
   #Regex_CommentBefore
   #Regex_Constant

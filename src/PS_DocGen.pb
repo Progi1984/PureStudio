@@ -19,7 +19,11 @@ IncludePath "PS_DocGen"
   XIncludeFile "Main.pb"
 
 Main_Init()
-Main_LoadPrefs()
 If FileSize(gsProject\sFilename) > 0
-  Main_DocGen()
+  LogFile_AddLog(glLogFile, "=====")
+  Main_ParseFiles()
+  LogFile_AddLog(glLogFile, "=====")
+  Main_ExportDoc()
+  LogFile_AddLog(glLogFile, "=====")
 EndIf
+Main_End()

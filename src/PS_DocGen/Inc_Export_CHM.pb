@@ -995,11 +995,10 @@ Procedure.l DocGen_CHM_GenerateHHC(sPath.s, sFile.s)
     WriteStringN(plFile, "</html>")
   CloseFile(plFile)
 EndProcedure
-Procedure.l DocGen_CHM_CompileCHM(sPath.s, sFile.s)
+Procedure.l DocGen_CHM_CompileCHM(sPath.s, sFile.s, sCHMCompiler.s)
   ; http://go.microsoft.com/fwlink/?LinkId=14188
-  Protected sCHMCompiler.s, sOutput.s
+  Protected sOutput.s
   Protected lPgmReturn.l
-  sCHMCompiler = "C:\Program Files\HTML Help Workshop\hhc.exe"
   If #PB_Compiler_OS = #PB_OS_Windows
     If FileSize(sCHMCompiler) > 0
       lPgmReturn = RunProgram(sCHMCompiler, sPath +StringField(sFile, 1, ".")+".hhp", "", #PB_Program_Hide|#PB_Program_Open|#PB_Program_Read)
@@ -1010,13 +1009,19 @@ Procedure.l DocGen_CHM_CompileCHM(sPath.s, sFile.s)
             LogFile_AddLog(glLogFile, ">>> " + sOutput)
           EndIf
         Wend
+      Else
+        LogFile_AddLog(glLogFile, ">>> No Return of the CHM Compiler")
       EndIf
     EndIf
   Else
     LogFile_AddLog(glLogFile, ">>> No CHM Compiler existing on this operating system")
   EndIf
 EndProcedure
-ProcedureDLL DocGen_ExportCHM(sPath.s, sFile.s)
+ProcedureDLL DocGen_ExportCHM()
+  Protected sPath.s, sFile.s, sCHMCompiler.s
+  sPath = LL_Exports()\sPathExport
+  sFile = LL_Exports()\sFileExport
+  sCHMCompiler = LL_Exports()\ExportCHM\sCHMCompiler
   LogFile_AddLog(glLogFile, ">> Create Directory (" + sPath + "HTML" + #System_Separator + ")") 
   CreateDirectory(sPath + "HTML" + #System_Separator)
   If FileSize(sPath + "HTML" + #System_Separator) = -2
@@ -1028,5 +1033,5 @@ ProcedureDLL DocGen_ExportCHM(sPath.s, sFile.s)
   LogFile_AddLog(glLogFile, ">> DocGen_CHM_GenerateHHC")
   DocGen_CHM_GenerateHHC(sPath, sFile)
   LogFile_AddLog(glLogFile, ">> DocGen_CHM_CompileCHM")
-  DocGen_CHM_CompileCHM(sPath, sFile)
+  DocGen_CHM_CompileCHM(sPath, sFile, sCHMCompiler)
 EndProcedure
